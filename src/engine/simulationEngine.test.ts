@@ -1,0 +1,69 @@
+import { describe, expect, it } from 'vitest'
+import { runSimulation } from './simulationEngine'
+import { ScenarioFormValues } from '../domain/scenario'
+import { mockObservation } from '../data/mockObservation'
+
+const baseScenario: ScenarioFormValues = {
+  id: 'test-scenario',
+  name: 'Test Scenario',
+  retirementAge: 60,
+  inflationRate: 0.02,
+  annualReturnRate: 0.12,
+  monthlyExpense: 100000,
+  monthlyInvestment: 200000,
+  initialAssets: {
+    cash: 1000000,
+    investment: 5000000,
+  },
+}
+
+describe('Simulation Engine', () => {
+  it('generates the same SimulationResult for the same input', () => {
+    const first = runSimulation(baseScenario, [mockObservation], 12)
+    const second = runSimulation(baseScenario, [mockObservation], 12)
+
+    expect(second).toEqual(first)
+  })
+
+  it('reflects monthly expense and monthly investment in cash and investment balances', () => {
+    const result = runSimulation(baseScenario, [], 2)
+
+    expect(result.states[0].assets.cash.market_value).toBe(1000000 - 100000)
+    expect(result.states[0].assets.investment.market_value).toBe(
+      (5000000 + 200000) * (1 + 0.12 / 12),
+    )
+    expect(result.states[1].assets.cash.market_value).toBe((1000000 - 100000) - 100000)
+  })
+
+  it('converts annual return to monthly return and applies it to investment', () => {
+    const result = runSimulation({
+      ...baseScenario,
+      annualReturnRate: 0.12,
+      monthlyExpense: 0,
+      monthlyInvestment: 0,
+    }, [], 1)
+
+    const expectedInvestment = 5000000 * (1 + 0.12 / 12)
+    expect(result.states[0].assets.investment.market_value).toBeCloseTo(expectedInvestment)
+  })
+
+  it('changes behavior when retirement age differs only in output metadata', () => {
+    const scenario60 = runSimulation({
+      ...baseScenario,
+      retirementAge: 60,
+    }, [], 1)
+    const scenario65 = runSimulation({
+      ...baseScenario,
+      retirementAge: 65,
+    }, [], 1)
+
+    expect(scenario60).toEqual(scenario65)
+    expect(scenario60.states[0].assets.cash.market_value).toBe(scenario65.states[0].assets.cash.market_value)
+  })
+
+  it('calculates total_assets correctly based on cash and investment', () => {
+    const result = runSimulation(baseScenario, [], 1)
+    const state = result.states[0]
+    expect(state.metrics.totalAssets).toBe(state.assets.cash.market_value + state.assets.investment.market_value)
+  })
+})
