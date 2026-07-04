@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActualObservation } from '../../domain/observation';
 import { SimulationResult } from '../../domain/simulation';
-import { buildGraphData } from '../../engine/graphData';
+import { buildGraphData, metricLabels, type MetricKey } from '../../engine/graphData';
 
 type Props = {
   results: SimulationResult[];
@@ -14,8 +14,9 @@ const lineColors = ['#2563eb', '#10b981', '#f97316', '#8b5cf6', '#ec4899'];
 
 export const ScenarioGraph = ({ results, observation, activeScenarioId, scenarioNames }: Props) => {
   const [hiddenScenarios, setHiddenScenarios] = React.useState<Record<string, boolean>>({});
+  const [metric, setMetric] = React.useState<MetricKey>('total_assets');
 
-  const graphData = buildGraphData(results, scenarioNames);
+  const graphData = buildGraphData(results, scenarioNames, metric);
   if (graphData.series.length === 0) {
     return <p>シミュレーションデータがありません。</p>;
   }
@@ -65,15 +66,29 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
       <h2>オーバーレイグラフ</h2>
       <div style={styles.summary}>
         <div>
-          <div style={styles.summaryLabel}>最新の総資産</div>
+          <div style={styles.summaryLabel}>{metricLabels[metric]} (最新)</div>
           <div style={styles.summaryValue}>
-            ¥{results[0].states[results[0].states.length - 1].metrics.total_assets.toLocaleString()}
+            ¥{results[0].states[results[0].states.length - 1].metrics[metric].toLocaleString()}
           </div>
         </div>
         <div>
           <div style={styles.summaryLabel}>表示シナリオ</div>
           <div style={styles.summaryValue}>{results.length} 件</div>
         </div>
+      </div>
+      <div style={styles.metricSelector}>
+        <label style={styles.label}>Metric</label>
+        <select
+          value={metric}
+          onChange={(event) => setMetric(event.target.value as MetricKey)}
+          style={styles.metricSelect}
+        >
+          {Object.entries(metricLabels).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div style={styles.chartWrapper}>
@@ -132,7 +147,7 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
           {seriesToRender.map((seriesItem, index) => {
             const pathData = seriesItem.points
               .map((point, pointIndex) => {
-                const { x, y } = toPoint(pointIndex, seriesItem.points, point.totalAssets);
+                const { x, y } = toPoint(pointIndex, seriesItem.points, point.value);
                 return `${pointIndex === 0 ? 'M' : 'L'} ${x} ${y}`;
               })
               .join(' ');
@@ -153,6 +168,24 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
             );
           })}
 
+          {graphData.alertMonths.map((marker, markerIndex) => {
+            const index = graphData.series[0].points.findIndex(
+              (point) => point.month === marker.month
+            );
+            if (index < 0) return null;
+            const x =
+              padding +
+              (index / (graphData.series[0].points.length - 1 || 1)) * (viewWidth - padding * 2);
+            return (
+              <g key={`${marker.month}-${markerIndex}`}>
+                <title>{marker.messages.join('\n')}</title>
+                <circle cx={x} cy={padding + 12} r={8} fill="#ef4444" opacity={0.95} />
+                <text x={x} y={padding + 34} textAnchor="middle" fontSize="10" fill="#b91c1c">
+                  {marker.count}
+                </text>
+              </g>
+            );
+          })}
           {observedX !== undefined ? (
             <line
               x1={observedX}

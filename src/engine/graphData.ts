@@ -1,8 +1,17 @@
 import { SimulationResult } from '../domain/simulation';
 
+export type MetricKey = 'total_assets' | 'cash_total' | 'liquid_assets' | 'after_tax_liquid_assets';
+
+export const metricLabels: Record<MetricKey, string> = {
+  total_assets: 'Total Assets',
+  cash_total: 'Cash Total',
+  liquid_assets: 'Liquid Assets',
+  after_tax_liquid_assets: 'After-Tax Liquid Assets',
+};
+
 export type GraphPoint = {
   month: string;
-  totalAssets: number;
+  value: number;
 };
 
 export type GraphSeries = {
@@ -11,8 +20,15 @@ export type GraphSeries = {
   points: GraphPoint[];
 };
 
+export type AlertMarker = {
+  month: string;
+  count: number;
+  messages: string[];
+};
+
 export type GraphData = {
   series: GraphSeries[];
+  alertMonths: AlertMarker[];
   xLabels: string[];
   yValues: number[];
   minValue: number;
@@ -36,9 +52,13 @@ const buildXLabels = (points: GraphPoint[], tickCount: number) => {
   });
 };
 
+const getMetricValue = (state: SimulationResult['states'][number], metric: MetricKey) =>
+  state.metrics[metric] ?? 0;
+
 export const buildGraphData = (
   results: SimulationResult[],
   scenarioNames: Record<string, string>,
+  metric: MetricKey = 'total_assets',
   tickCount = 5
 ): GraphData => {
   const series = results.map((result) => ({
@@ -46,21 +66,44 @@ export const buildGraphData = (
     label: scenarioNames[result.scenarioId] ?? result.scenarioId,
     points: result.states.map((state) => ({
       month: state.month,
-      totalAssets: state.metrics.total_assets,
+      value: getMetricValue(state, metric),
     })),
   }));
 
   const allPoints = series.flatMap((item) => item.points);
-  const minValue =
-    allPoints.length > 0 ? Math.min(...allPoints.map((point) => point.totalAssets)) : 0;
-  const maxValue =
-    allPoints.length > 0 ? Math.max(...allPoints.map((point) => point.totalAssets)) : 0;
+  const minValue = allPoints.length > 0 ? Math.min(...allPoints.map((point) => point.value)) : 0;
+  const maxValue = allPoints.length > 0 ? Math.max(...allPoints.map((point) => point.value)) : 0;
+
+  const alertMonthMap = new Map<string, { count: number; messages: string[] }>();
+  results.forEach((result) => {
+    result.states.forEach((state) => {
+      const messages = state.alerts.map(
+        (alert) => `${alert.target.id} ${alert.operator} ${alert.value}: ${alert.message}`
+      );
+      if (messages.length > 0) {
+        const existing = alertMonthMap.get(state.month);
+        if (existing) {
+          alertMonthMap.set(state.month, {
+            count: existing.count + messages.length,
+            messages: [...existing.messages, ...messages],
+          });
+        } else {
+          alertMonthMap.set(state.month, { count: messages.length, messages });
+        }
+      }
+    });
+  });
+
+  const alertMonths = Array.from(alertMonthMap.entries())
+    .map(([month, data]) => ({ month, count: data.count, messages: data.messages }))
+    .sort((a, b) => a.month.localeCompare(b.month));
 
   const yValues = buildTicks(tickCount, minValue, maxValue);
   const xLabels = series.length > 0 ? buildXLabels(series[0].points, tickCount) : [];
 
   return {
     series,
+    alertMonths,
     xLabels,
     yValues,
     minValue,
