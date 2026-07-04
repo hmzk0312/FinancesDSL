@@ -172,30 +172,22 @@ const overlayObservation = (
 ) => {
   // Overlay only the observed assets; unobserved assets continue with existing simulated state.
   if (!observation) return state
-  const cashAsset = observation.assets.find((asset) => asset.asset_id === 'cash')
-  const investmentAsset = observation.assets.find((asset) => asset.asset_id === 'investment')
 
-  const assets = {
-    ...state.assets,
-    cash: cashAsset
-      ? {
-          asset_id: 'cash',
-          market_value: cashAsset.market_value,
-          cost_basis: cashAsset.cost_basis,
-          liquidity_profile: state.assets.cash.liquidity_profile,
-          tax_profile: state.assets.cash.tax_profile,
-        }
-      : state.assets.cash,
-    investment: investmentAsset
-      ? {
-          asset_id: 'investment',
-          market_value: investmentAsset.market_value,
-          cost_basis: investmentAsset.cost_basis,
-          liquidity_profile: state.assets.investment.liquidity_profile,
-          tax_profile: state.assets.investment.tax_profile,
-        }
-      : state.assets.investment,
-  }
+  const assets = { ...state.assets }
+
+  observation.assets.forEach((observed) => {
+    const existingAsset = assets[observed.asset_id]
+    if (!existingAsset) {
+      throw new Error(`ActualObservation contains unknown asset_id: ${observed.asset_id}`)
+    }
+
+    assets[observed.asset_id] = {
+      ...existingAsset,
+      asset_id: observed.asset_id,
+      market_value: observed.market_value,
+      cost_basis: observed.cost_basis ?? existingAsset.cost_basis,
+    }
+  })
 
   return {
     ...state,
@@ -316,7 +308,13 @@ const applyTransferEvent = (
 const findObservation = (
   observations: ActualObservation[],
   yearMonth: string,
-) => observations.find((obs) => obs.observedAt === yearMonth)
+) => {
+  const matched = observations.filter((obs) => obs.observedAt === yearMonth)
+  if (matched.length > 1) {
+    throw new Error(`Multiple ActualObservation entries found for ${yearMonth}`)
+  }
+  return matched[0]
+}
 
 export const runSimulation = (
   scenarioForm: ScenarioFormValues,

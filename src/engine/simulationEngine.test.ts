@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { runSimulation } from './simulationEngine'
 import { ScenarioFormValues } from '../domain/scenario'
 import { mockObservation } from '../data/mockObservation'
+import { ActualObservation } from '../domain/observation'
 
 const baseScenario: ScenarioFormValues = {
   id: 'test-scenario',
@@ -120,5 +121,48 @@ describe('Simulation Engine', () => {
 
     const result = runSimulation(scenarioWithTransition, [], 1)
     expect(result.states[0].states.simulation).toBe('retired')
+  })
+
+  it('overlays observed asset values and cost basis while preserving unobserved asset state', () => {
+    const observation: ActualObservation = {
+      observedAt: '2026-06-01',
+      assets: [
+        {
+          asset_id: 'cash',
+          market_value: 1234567,
+        },
+      ],
+    }
+
+    const result = runSimulation(
+      {
+        ...baseScenario,
+        monthlyExpense: 0,
+        monthlyInvestment: 0,
+        annualReturnRate: 0,
+      },
+      [observation],
+      1,
+    )
+
+    expect(result.states[0].assets.cash.market_value).toBe(1234567)
+    expect(result.states[0].assets.cash.cost_basis).toBeUndefined()
+    expect(result.states[0].assets.investment.market_value).toBe(5000000)
+  })
+
+  it('throws if ActualObservation contains unknown asset_id', () => {
+    const observation: ActualObservation = {
+      observedAt: '2026-06-01',
+      assets: [
+        {
+          asset_id: 'unknown_asset',
+          market_value: 500000,
+        },
+      ],
+    }
+
+    expect(() => runSimulation(baseScenario, [observation], 1)).toThrow(
+      'ActualObservation contains unknown asset_id: unknown_asset',
+    )
   })
 })
