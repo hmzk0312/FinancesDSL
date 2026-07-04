@@ -1,17 +1,17 @@
-import React from 'react'
+import React from 'react';
 import {
   ScenarioFormValues,
   Asset,
   TransferEvent,
   StateTransition,
   AlertRule,
-} from '../../domain/scenario'
+} from '../../domain/scenario';
 
 type Props = {
-  scenarios: ScenarioFormValues[]
-  value: ScenarioFormValues
-  onChange: (value: ScenarioFormValues) => void
-}
+  scenarios: ScenarioFormValues[];
+  value: ScenarioFormValues;
+  onChange: (value: ScenarioFormValues) => void;
+};
 
 const defaultAsset: Asset = {
   asset_id: '',
@@ -19,7 +19,7 @@ const defaultAsset: Asset = {
   liquidity_profile: 'cash',
   tax_profile: 'none',
   return_profile: { type: 'fixed', annual_rate: 0 },
-}
+};
 
 const defaultTransferEvent: TransferEvent = {
   id: '',
@@ -27,7 +27,7 @@ const defaultTransferEvent: TransferEvent = {
   to: 'cash',
   amount: { type: 'fixed', value: 0 },
   schedule: { type: 'monthly' },
-}
+};
 
 const defaultStateTransition: StateTransition = {
   id: '',
@@ -39,7 +39,7 @@ const defaultStateTransition: StateTransition = {
       value: 0,
     },
   },
-}
+};
 
 const defaultAlertRule: AlertRule = {
   id: '',
@@ -53,33 +53,39 @@ const defaultAlertRule: AlertRule = {
   },
   purpose: 'warning',
   message: '',
-}
+};
 
 export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
-  const updateField = <K extends keyof ScenarioFormValues>(key: K, nextValue: ScenarioFormValues[K]) => {
-    onChange({ ...value, [key]: nextValue })
-  }
+  const updateField = <K extends keyof ScenarioFormValues>(
+    key: K,
+    nextValue: ScenarioFormValues[K]
+  ) => {
+    onChange({ ...value, [key]: nextValue });
+  };
 
   const updateAssets = (nextAssets: Asset[]) => {
-    onChange({ ...value, assets: nextAssets })
-  }
+    onChange({ ...value, assets: nextAssets });
+  };
 
   const updateTransferEvents = (nextTransferEvents: TransferEvent[]) => {
-    onChange({ ...value, transferEvents: nextTransferEvents })
-  }
+    onChange({ ...value, transferEvents: nextTransferEvents });
+  };
 
   const updateStateTransitions = (nextStateTransitions: StateTransition[]) => {
-    onChange({ ...value, stateTransitions: nextStateTransitions })
-  }
+    onChange({ ...value, stateTransitions: nextStateTransitions });
+  };
 
   const updateAlertRules = (nextAlertRules: AlertRule[]) => {
-    onChange({ ...value, alertRules: nextAlertRules })
-  }
+    onChange({ ...value, alertRules: nextAlertRules });
+  };
 
-  const addAsset = () => updateAssets([...value.assets, { ...defaultAsset }])
-  const addTransferEvent = () => updateTransferEvents([...(value.transferEvents ?? []), { ...defaultTransferEvent }])
-  const addStateTransition = () => updateStateTransitions([...(value.stateTransitions ?? []), { ...defaultStateTransition }])
-  const addAlertRule = () => updateAlertRules([...(value.alertRules ?? []), { ...defaultAlertRule }])
+  const addAsset = () => updateAssets([...value.assets, { ...defaultAsset }]);
+  const addTransferEvent = () =>
+    updateTransferEvents([...(value.transferEvents ?? []), { ...defaultTransferEvent }]);
+  const addStateTransition = () =>
+    updateStateTransitions([...(value.stateTransitions ?? []), { ...defaultStateTransition }]);
+  const addAlertRule = () =>
+    updateAlertRules([...(value.alertRules ?? []), { ...defaultAlertRule }]);
 
   return (
     <div>
@@ -89,8 +95,8 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
         <select
           value={value.id}
           onChange={(event) => {
-            const next = scenarios.find((scenario) => scenario.id === event.target.value)
-            if (next) onChange(next)
+            const next = scenarios.find((scenario) => scenario.id === event.target.value);
+            if (next) onChange(next);
           }}
           style={styles.select}
         >
@@ -159,9 +165,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={asset.asset_id}
                 onChange={(event) => {
-                  const nextAssets = [...value.assets]
-                  nextAssets[index] = { ...asset, asset_id: event.target.value }
-                  updateAssets(nextAssets)
+                  const nextAssets = [...value.assets];
+                  nextAssets[index] = { ...asset, asset_id: event.target.value };
+                  updateAssets(nextAssets);
                 }}
                 style={styles.input}
               />
@@ -172,9 +178,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="number"
                 value={asset.market_value}
                 onChange={(event) => {
-                  const nextAssets = [...value.assets]
-                  nextAssets[index] = { ...asset, market_value: Number(event.target.value) }
-                  updateAssets(nextAssets)
+                  const nextAssets = [...value.assets];
+                  nextAssets[index] = { ...asset, market_value: Number(event.target.value) };
+                  updateAssets(nextAssets);
                 }}
                 style={styles.input}
               />
@@ -185,9 +191,12 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <select
                   value={asset.liquidity_profile}
                   onChange={(event) => {
-                    const nextAssets = [...value.assets]
-                    nextAssets[index] = { ...asset, liquidity_profile: event.target.value as Asset['liquidity_profile'] }
-                    updateAssets(nextAssets)
+                    const nextAssets = [...value.assets];
+                    nextAssets[index] = {
+                      ...asset,
+                      liquidity_profile: event.target.value as Asset['liquidity_profile'],
+                    };
+                    updateAssets(nextAssets);
                   }}
                   style={styles.input}
                 >
@@ -201,9 +210,12 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <select
                   value={asset.tax_profile}
                   onChange={(event) => {
-                    const nextAssets = [...value.assets]
-                    nextAssets[index] = { ...asset, tax_profile: event.target.value as Asset['tax_profile'] }
-                    updateAssets(nextAssets)
+                    const nextAssets = [...value.assets];
+                    nextAssets[index] = {
+                      ...asset,
+                      tax_profile: event.target.value as Asset['tax_profile'],
+                    };
+                    updateAssets(nextAssets);
                   }}
                   style={styles.input}
                 >
@@ -220,12 +232,15 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                   step="0.001"
                   value={asset.return_profile.annual_rate}
                   onChange={(event) => {
-                    const nextAssets = [...value.assets]
+                    const nextAssets = [...value.assets];
                     nextAssets[index] = {
                       ...asset,
-                      return_profile: { ...asset.return_profile, annual_rate: Number(event.target.value) },
-                    }
-                    updateAssets(nextAssets)
+                      return_profile: {
+                        ...asset.return_profile,
+                        annual_rate: Number(event.target.value),
+                      },
+                    };
+                    updateAssets(nextAssets);
                   }}
                   style={styles.input}
                 />
@@ -250,9 +265,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={event.id}
                 onChange={(e) => {
-                  const next = [...(value.transferEvents ?? [])]
-                  next[index] = { ...event, id: e.target.value }
-                  updateTransferEvents(next)
+                  const next = [...(value.transferEvents ?? [])];
+                  next[index] = { ...event, id: e.target.value };
+                  updateTransferEvents(next);
                 }}
                 style={styles.input}
               />
@@ -263,9 +278,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={event.from}
                 onChange={(e) => {
-                  const next = [...(value.transferEvents ?? [])]
-                  next[index] = { ...event, from: e.target.value }
-                  updateTransferEvents(next)
+                  const next = [...(value.transferEvents ?? [])];
+                  next[index] = { ...event, from: e.target.value };
+                  updateTransferEvents(next);
                 }}
                 style={styles.input}
               />
@@ -276,9 +291,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={event.to}
                 onChange={(e) => {
-                  const next = [...(value.transferEvents ?? [])]
-                  next[index] = { ...event, to: e.target.value }
-                  updateTransferEvents(next)
+                  const next = [...(value.transferEvents ?? [])];
+                  next[index] = { ...event, to: e.target.value };
+                  updateTransferEvents(next);
                 }}
                 style={styles.input}
               />
@@ -290,9 +305,12 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                   type="number"
                   value={event.amount.value}
                   onChange={(e) => {
-                    const next = [...(value.transferEvents ?? [])]
-                    next[index] = { ...event, amount: { ...event.amount, value: Number(e.target.value) } }
-                    updateTransferEvents(next)
+                    const next = [...(value.transferEvents ?? [])];
+                    next[index] = {
+                      ...event,
+                      amount: { ...event.amount, value: Number(e.target.value) },
+                    };
+                    updateTransferEvents(next);
                   }}
                   style={styles.input}
                 />
@@ -302,9 +320,15 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <select
                   value={event.amount.type}
                   onChange={(e) => {
-                    const next = [...(value.transferEvents ?? [])]
-                    next[index] = { ...event, amount: { ...event.amount, type: e.target.value as TransferEvent['amount']['type'] } }
-                    updateTransferEvents(next)
+                    const next = [...(value.transferEvents ?? [])];
+                    next[index] = {
+                      ...event,
+                      amount: {
+                        ...event.amount,
+                        type: e.target.value as TransferEvent['amount']['type'],
+                      },
+                    };
+                    updateTransferEvents(next);
                   }}
                   style={styles.input}
                 >
@@ -317,9 +341,15 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <select
                   value={event.schedule.type}
                   onChange={(e) => {
-                    const next = [...(value.transferEvents ?? [])]
-                    next[index] = { ...event, schedule: { ...event.schedule, type: e.target.value as TransferEvent['schedule']['type'] } }
-                    updateTransferEvents(next)
+                    const next = [...(value.transferEvents ?? [])];
+                    next[index] = {
+                      ...event,
+                      schedule: {
+                        ...event.schedule,
+                        type: e.target.value as TransferEvent['schedule']['type'],
+                      },
+                    };
+                    updateTransferEvents(next);
                   }}
                   style={styles.input}
                 >
@@ -348,9 +378,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={transition.id}
                 onChange={(e) => {
-                  const next = [...(value.stateTransitions ?? [])]
-                  next[index] = { ...transition, id: e.target.value }
-                  updateStateTransitions(next)
+                  const next = [...(value.stateTransitions ?? [])];
+                  next[index] = { ...transition, id: e.target.value };
+                  updateStateTransitions(next);
                 }}
                 style={styles.input}
               />
@@ -361,9 +391,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={transition.state}
                 onChange={(e) => {
-                  const next = [...(value.stateTransitions ?? [])]
-                  next[index] = { ...transition, state: e.target.value }
-                  updateStateTransitions(next)
+                  const next = [...(value.stateTransitions ?? [])];
+                  next[index] = { ...transition, state: e.target.value };
+                  updateStateTransitions(next);
                 }}
                 style={styles.input}
               />
@@ -375,7 +405,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                   type="text"
                   value={transition.condition.value.target.id}
                   onChange={(e) => {
-                    const next = [...(value.stateTransitions ?? [])]
+                    const next = [...(value.stateTransitions ?? [])];
                     next[index] = {
                       ...transition,
                       condition: {
@@ -385,8 +415,8 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                           target: { ...transition.condition.value.target, id: e.target.value },
                         },
                       },
-                    }
-                    updateStateTransitions(next)
+                    };
+                    updateStateTransitions(next);
                   }}
                   style={styles.input}
                 />
@@ -396,15 +426,18 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <select
                   value={transition.condition.value.operator}
                   onChange={(e) => {
-                    const next = [...(value.stateTransitions ?? [])]
+                    const next = [...(value.stateTransitions ?? [])];
                     next[index] = {
                       ...transition,
                       condition: {
                         ...transition.condition,
-                        value: { ...transition.condition.value, operator: e.target.value as 'eq' | 'gte' | 'lte' },
+                        value: {
+                          ...transition.condition.value,
+                          operator: e.target.value as 'eq' | 'gte' | 'lte',
+                        },
                       },
-                    }
-                    updateStateTransitions(next)
+                    };
+                    updateStateTransitions(next);
                   }}
                   style={styles.input}
                 >
@@ -419,15 +452,15 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                   type="number"
                   value={transition.condition.value.value}
                   onChange={(e) => {
-                    const next = [...(value.stateTransitions ?? [])]
+                    const next = [...(value.stateTransitions ?? [])];
                     next[index] = {
                       ...transition,
                       condition: {
                         ...transition.condition,
                         value: { ...transition.condition.value, value: Number(e.target.value) },
                       },
-                    }
-                    updateStateTransitions(next)
+                    };
+                    updateStateTransitions(next);
                   }}
                   style={styles.input}
                 />
@@ -452,9 +485,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={rule.id}
                 onChange={(e) => {
-                  const next = [...(value.alertRules ?? [])]
-                  next[index] = { ...rule, id: e.target.value }
-                  updateAlertRules(next)
+                  const next = [...(value.alertRules ?? [])];
+                  next[index] = { ...rule, id: e.target.value };
+                  updateAlertRules(next);
                 }}
                 style={styles.input}
               />
@@ -464,9 +497,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
               <select
                 value={rule.purpose}
                 onChange={(e) => {
-                  const next = [...(value.alertRules ?? [])]
-                  next[index] = { ...rule, purpose: e.target.value as AlertRule['purpose'] }
-                  updateAlertRules(next)
+                  const next = [...(value.alertRules ?? [])];
+                  next[index] = { ...rule, purpose: e.target.value as AlertRule['purpose'] };
+                  updateAlertRules(next);
                 }}
                 style={styles.input}
               >
@@ -481,9 +514,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 type="text"
                 value={rule.message}
                 onChange={(e) => {
-                  const next = [...(value.alertRules ?? [])]
-                  next[index] = { ...rule, message: e.target.value }
-                  updateAlertRules(next)
+                  const next = [...(value.alertRules ?? [])];
+                  next[index] = { ...rule, message: e.target.value };
+                  updateAlertRules(next);
                 }}
                 style={styles.input}
               />
@@ -495,12 +528,12 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                   type="text"
                   value={rule.target.id}
                   onChange={(e) => {
-                    const next = [...(value.alertRules ?? [])]
+                    const next = [...(value.alertRules ?? [])];
                     next[index] = {
                       ...rule,
                       target: { ...rule.target, id: e.target.value },
-                    }
-                    updateAlertRules(next)
+                    };
+                    updateAlertRules(next);
                   }}
                   style={styles.input}
                 />
@@ -510,15 +543,18 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <select
                   value={rule.condition.value.operator}
                   onChange={(e) => {
-                    const next = [...(value.alertRules ?? [])]
+                    const next = [...(value.alertRules ?? [])];
                     next[index] = {
                       ...rule,
                       condition: {
                         ...rule.condition,
-                        value: { ...rule.condition.value, operator: e.target.value as 'eq' | 'gte' | 'lte' },
+                        value: {
+                          ...rule.condition.value,
+                          operator: e.target.value as 'eq' | 'gte' | 'lte',
+                        },
                       },
-                    }
-                    updateAlertRules(next)
+                    };
+                    updateAlertRules(next);
                   }}
                   style={styles.input}
                 >
@@ -533,15 +569,15 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                   type="number"
                   value={rule.condition.value.value}
                   onChange={(e) => {
-                    const next = [...(value.alertRules ?? [])]
+                    const next = [...(value.alertRules ?? [])];
                     next[index] = {
                       ...rule,
                       condition: {
                         ...rule.condition,
                         value: { ...rule.condition.value, value: Number(e.target.value) },
                       },
-                    }
-                    updateAlertRules(next)
+                    };
+                    updateAlertRules(next);
                   }}
                   style={styles.input}
                 />
@@ -551,8 +587,8 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const styles: Record<string, React.CSSProperties> = {
   field: {
@@ -625,4 +661,4 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '8px',
   },
-}
+};

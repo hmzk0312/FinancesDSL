@@ -1,4 +1,4 @@
-import { ActualObservation } from '../domain/observation'
+import { ActualObservation } from '../domain/observation';
 
 export const mockObservation: ActualObservation = {
   observedAt: '2026-06-01',
@@ -13,4 +13,4 @@ export const mockObservation: ActualObservation = {
       cost_basis: 9000000,
     },
   ],
-}
+};

@@ -1,25 +1,26 @@
-import React, { useMemo, useState } from 'react'
-import { mockScenarios } from '../data/mockScenarios'
-import { mockObservation } from '../data/mockObservation'
-import { ScenarioEditor } from './components/ScenarioEditor'
-import { ScenarioGraph } from './components/ScenarioGraph'
-import { useSimulation } from './hooks/useSimulation'
-import { ScenarioFormValues } from '../domain/scenario'
+import React, { useMemo, useState } from 'react';
+import { mockScenarios } from '../data/mockScenarios';
+import { mockObservation } from '../data/mockObservation';
+import { ScenarioEditor } from './components/ScenarioEditor';
+import { ScenarioGraph } from './components/ScenarioGraph';
+import { useSimulation } from './hooks/useSimulation';
+import { ScenarioFormValues } from '../domain/scenario';
 
 const App = () => {
-  const [scenarioForm, setScenarioForm] = useState<ScenarioFormValues>(mockScenarios[0])
+  const [scenarioForm, setScenarioForm] = useState<ScenarioFormValues>(mockScenarios[0]);
 
   const comparisonScenarios = useMemo(
-    () => mockScenarios.map((scenario) => (scenario.id === scenarioForm.id ? scenarioForm : scenario)),
-    [scenarioForm],
-  )
+    () =>
+      mockScenarios.map((scenario) => (scenario.id === scenarioForm.id ? scenarioForm : scenario)),
+    [scenarioForm]
+  );
 
   const scenarioNames = useMemo(
     () => Object.fromEntries(comparisonScenarios.map((scenario) => [scenario.id, scenario.name])),
-    [comparisonScenarios],
-  )
+    [comparisonScenarios]
+  );
 
-  const simulationResults = useSimulation(comparisonScenarios, mockObservation, 120)
+  const simulationResults = useSimulation(comparisonScenarios, mockObservation, 120);
 
   return (
     <div style={styles.page}>
@@ -45,8 +46,8 @@ const App = () => {
         </aside>
       </main>
     </div>
-  )
-}
+  );
+};
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
@@ -78,6 +79,6 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#ffffff',
     boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
   },
-}
+};
 
-export default App
+export default App;

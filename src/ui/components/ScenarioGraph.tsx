@@ -1,56 +1,64 @@
-import React from 'react'
-import { ActualObservation } from '../../domain/observation'
-import { SimulationResult } from '../../domain/simulation'
-import { buildGraphData } from '../../engine/graphData'
+import React from 'react';
+import { ActualObservation } from '../../domain/observation';
+import { SimulationResult } from '../../domain/simulation';
+import { buildGraphData } from '../../engine/graphData';
 
 type Props = {
-  results: SimulationResult[]
-  observation: ActualObservation
-  activeScenarioId?: string
-  scenarioNames: Record<string, string>
-}
+  results: SimulationResult[];
+  observation: ActualObservation;
+  activeScenarioId?: string;
+  scenarioNames: Record<string, string>;
+};
 
-const lineColors = ['#2563eb', '#10b981', '#f97316', '#8b5cf6', '#ec4899']
+const lineColors = ['#2563eb', '#10b981', '#f97316', '#8b5cf6', '#ec4899'];
 
 export const ScenarioGraph = ({ results, observation, activeScenarioId, scenarioNames }: Props) => {
-  const [hiddenScenarios, setHiddenScenarios] = React.useState<Record<string, boolean>>({})
+  const [hiddenScenarios, setHiddenScenarios] = React.useState<Record<string, boolean>>({});
 
-  const graphData = buildGraphData(results, scenarioNames)
+  const graphData = buildGraphData(results, scenarioNames);
   if (graphData.series.length === 0) {
-    return <p>シミュレーションデータがありません。</p>
+    return <p>シミュレーションデータがありません。</p>;
   }
 
-  const viewWidth = 760
-  const viewHeight = 380
-  const padding = 40
+  const viewWidth = 760;
+  const viewHeight = 380;
+  const padding = 40;
 
   const toggleScenario = (scenarioId: string) => {
     setHiddenScenarios((prev) => ({
       ...prev,
       [scenarioId]: !prev[scenarioId],
-    }))
-  }
+    }));
+  };
 
-  const displayedSeries = graphData.series.filter((item) => !hiddenScenarios[item.scenarioId])
-  const seriesToRender = displayedSeries.length > 0 ? displayedSeries : graphData.series
-  const range = graphData.maxValue - graphData.minValue || 1
+  const displayedSeries = graphData.series.filter((item) => !hiddenScenarios[item.scenarioId]);
+  const seriesToRender = displayedSeries.length > 0 ? displayedSeries : graphData.series;
+  const range = graphData.maxValue - graphData.minValue || 1;
 
-  const toPoint = (index: number, points: typeof graphData.series[0]['points'], value: number) => {
-    const x = padding + (index / (points.length - 1 || 1)) * (viewWidth - padding * 2)
-    const y = viewHeight - padding - ((value - graphData.minValue) / range) * (viewHeight - padding * 2)
-    return { x, y }
-  }
+  const toPoint = (
+    index: number,
+    points: (typeof graphData.series)[0]['points'],
+    value: number
+  ) => {
+    const x = padding + (index / (points.length - 1 || 1)) * (viewWidth - padding * 2);
+    const y =
+      viewHeight - padding - ((value - graphData.minValue) / range) * (viewHeight - padding * 2);
+    return { x, y };
+  };
 
   const xTickIndexes = graphData.xLabels.map((_, idx) =>
-    Math.floor((idx / (graphData.xLabels.length - 1 || 1)) * ((graphData.series[0]?.points.length ?? 1) - 1)),
-  )
-  const yTickValues = graphData.yValues
+    Math.floor(
+      (idx / (graphData.xLabels.length - 1 || 1)) * ((graphData.series[0]?.points.length ?? 1) - 1)
+    )
+  );
+  const yTickValues = graphData.yValues;
 
-  const observedIndex = graphData.series[0]?.points.findIndex((point) => point.month === observation.observedAt) ?? -1
+  const observedIndex =
+    graphData.series[0]?.points.findIndex((point) => point.month === observation.observedAt) ?? -1;
   const observedX =
     observedIndex >= 0
       ? padding + (observedIndex / (results[0].states.length - 1 || 1)) * (viewWidth - padding * 2)
-      : undefined
+      : undefined;
 
   return (
     <div>
@@ -71,13 +79,7 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
       <div style={styles.chartWrapper}>
         <svg viewBox={`0 0 ${viewWidth} ${viewHeight}`} style={styles.chart}>
           <rect x="0" y="0" width="100%" height="100%" fill="#f8fafc" rx="18" />
-          <line
-            x1={padding}
-            y1={padding}
-            x2={padding}
-            y2={viewHeight - padding}
-            stroke="#d1d5db"
-          />
+          <line x1={padding} y1={padding} x2={padding} y2={viewHeight - padding} stroke="#d1d5db" />
           <line
             x1={padding}
             y1={viewHeight - padding}
@@ -87,7 +89,10 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
           />
 
           {yTickValues.map((value) => {
-            const y = viewHeight - padding - ((value - graphData.minValue) / range) * (viewHeight - padding * 2)
+            const y =
+              viewHeight -
+              padding -
+              ((value - graphData.minValue) / range) * (viewHeight - padding * 2);
             return (
               <g key={value}>
                 <line x1={padding - 6} y1={y} x2={padding} y2={y} stroke="#9ca3af" />
@@ -95,33 +100,45 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
                   ¥{value.toLocaleString()}
                 </text>
               </g>
-            )
+            );
           })}
 
           {graphData.xLabels.map((label, index) => {
-            const position = xTickIndexes[index]
-            const pointsLength = graphData.series[0]?.points.length ?? 1
-            const x = padding + (position / (pointsLength - 1 || 1)) * (viewWidth - padding * 2)
+            const position = xTickIndexes[index];
+            const pointsLength = graphData.series[0]?.points.length ?? 1;
+            const x = padding + (position / (pointsLength - 1 || 1)) * (viewWidth - padding * 2);
             return (
               <g key={index}>
-                <line x1={x} y1={viewHeight - padding} x2={x} y2={viewHeight - padding + 6} stroke="#9ca3af" />
-                <text x={x} y={viewHeight - padding + 20} textAnchor="middle" fontSize="12" fill="#374151">
+                <line
+                  x1={x}
+                  y1={viewHeight - padding}
+                  x2={x}
+                  y2={viewHeight - padding + 6}
+                  stroke="#9ca3af"
+                />
+                <text
+                  x={x}
+                  y={viewHeight - padding + 20}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fill="#374151"
+                >
                   {label.slice(0, 7)}
                 </text>
               </g>
-            )
+            );
           })}
 
           {seriesToRender.map((seriesItem, index) => {
             const pathData = seriesItem.points
               .map((point, pointIndex) => {
-                const { x, y } = toPoint(pointIndex, seriesItem.points, point.totalAssets)
-                return `${pointIndex === 0 ? 'M' : 'L'} ${x} ${y}`
+                const { x, y } = toPoint(pointIndex, seriesItem.points, point.totalAssets);
+                return `${pointIndex === 0 ? 'M' : 'L'} ${x} ${y}`;
               })
-              .join(' ')
+              .join(' ');
 
-            const isActive = seriesItem.scenarioId === activeScenarioId
-            const color = lineColors[index % lineColors.length]
+            const isActive = seriesItem.scenarioId === activeScenarioId;
+            const color = lineColors[index % lineColors.length];
 
             return (
               <path
@@ -133,7 +150,7 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
                 strokeOpacity={isActive ? 1 : 0.75}
                 strokeLinecap="round"
               />
-            )
+            );
           })}
 
           {observedX !== undefined ? (
@@ -150,7 +167,13 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
           <text x={padding - 10} y={padding - 12} textAnchor="start" fontSize="12" fill="#374151">
             金額 (円)
           </text>
-          <text x={viewWidth / 2} y={viewHeight - 6} textAnchor="middle" fontSize="12" fill="#374151">
+          <text
+            x={viewWidth / 2}
+            y={viewHeight - 6}
+            textAnchor="middle"
+            fontSize="12"
+            fill="#374151"
+          >
             月
           </text>
         </svg>
@@ -158,9 +181,9 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
 
       <div style={styles.legend}>
         {results.map((result, index) => {
-          const color = lineColors[index % lineColors.length]
-          const hidden = hiddenScenarios[result.scenarioId]
-          const isActive = result.scenarioId === activeScenarioId
+          const color = lineColors[index % lineColors.length];
+          const hidden = hiddenScenarios[result.scenarioId];
+          const isActive = result.scenarioId === activeScenarioId;
           return (
             <button
               key={result.scenarioId}
@@ -178,12 +201,12 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
                 {scenarioNames[result.scenarioId] ?? result.scenarioId}
               </span>
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const styles: Record<string, React.CSSProperties> = {
   chart: {
@@ -225,4 +248,4 @@ const styles: Record<string, React.CSSProperties> = {
     height: '12px',
     borderRadius: '9999px',
   },
-}
+};

@@ -1,4 +1,4 @@
-import { Scenario, ScenarioFormValues } from './scenario'
+import { Scenario, ScenarioFormValues } from './scenario';
 
 export const DEFAULT_SCENARIO: Scenario = {
   assumptions: {
@@ -35,7 +35,7 @@ export const DEFAULT_SCENARIO: Scenario = {
   transfer_events: [],
   state_transitions: [],
   alert_rules: [],
-}
+};
 
 export const toScenario = (values: ScenarioFormValues): Scenario => ({
   assumptions: {
@@ -50,4 +50,4 @@ export const toScenario = (values: ScenarioFormValues): Scenario => ({
   transfer_events: values.transferEvents ?? [],
   state_transitions: values.stateTransitions ?? [],
   alert_rules: values.alertRules ?? [],
-})
+});

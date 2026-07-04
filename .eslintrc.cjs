@@ -26,7 +26,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
@@ -46,4 +46,4 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/jsx-uses-vars': 'error',
   },
-}
+};

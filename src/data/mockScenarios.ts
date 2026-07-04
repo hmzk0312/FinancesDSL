@@ -1,4 +1,4 @@
-import { ScenarioFormValues } from '../domain/scenario'
+import { ScenarioFormValues } from '../domain/scenario';
 
 export const mockScenarios: ScenarioFormValues[] = [
   {
@@ -73,4 +73,4 @@ export const mockScenarios: ScenarioFormValues[] = [
       },
     ],
   },
-]
+];

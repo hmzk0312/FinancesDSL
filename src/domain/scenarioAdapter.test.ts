@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { ScenarioFormValues } from './scenario'
-import { toScenario } from './scenarioAdapter'
+import { describe, expect, it } from 'vitest';
+import { ScenarioFormValues } from './scenario';
+import { toScenario } from './scenarioAdapter';
 
 describe('Scenario Adapter', () => {
   it('converts form values to a Scenario with equivalent assumptions and assets', () => {
@@ -27,13 +27,17 @@ describe('Scenario Adapter', () => {
           return_profile: { type: 'fixed', annual_rate: 0.08 },
         },
       ],
-    }
+    };
 
-    const scenario = toScenario(formValues)
+    const scenario = toScenario(formValues);
 
-    expect(scenario.assumptions.inflation_rate).toBe(0.03)
-    expect(scenario.assets.find((asset) => asset.asset_id === 'cash')?.market_value).toBe(2000000)
-    expect(scenario.assets.find((asset) => asset.asset_id === 'investment')?.market_value).toBe(8000000)
-    expect(scenario.assets.find((asset) => asset.asset_id === 'investment')?.return_profile.annual_rate).toBe(0.08)
-  })
-})
+    expect(scenario.assumptions.inflation_rate).toBe(0.03);
+    expect(scenario.assets.find((asset) => asset.asset_id === 'cash')?.market_value).toBe(2000000);
+    expect(scenario.assets.find((asset) => asset.asset_id === 'investment')?.market_value).toBe(
+      8000000
+    );
+    expect(
+      scenario.assets.find((asset) => asset.asset_id === 'investment')?.return_profile.annual_rate
+    ).toBe(0.08);
+  });
+});
