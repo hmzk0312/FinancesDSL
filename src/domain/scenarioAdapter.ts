@@ -1,4 +1,4 @@
-import { Scenario, ScenarioFormValues, Asset } from './scenario'
+import { Scenario, ScenarioFormValues } from './scenario'
 
 export const DEFAULT_SCENARIO: Scenario = {
   assumptions: {

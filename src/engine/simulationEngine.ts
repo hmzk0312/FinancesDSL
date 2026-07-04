@@ -14,16 +14,6 @@ const addMonths = (yearMonth: string, months: number) => {
   return toYearMonthString(date.getFullYear(), date.getMonth() + 1)
 }
 
-const getAgeAtMonth = (birthDate: string, yearMonth: string) => {
-  const birth = new Date(birthDate)
-  const [year, month] = yearMonth.split('-').map(Number)
-  let age = year - birth.getFullYear()
-  if (month - 1 < birth.getMonth()) {
-    age -= 1
-  }
-  return age
-}
-
 // Convert annual return to a fixed monthly rate for simple monthly compounding.
 const monthlyRate = (annualRate: number) => annualRate / 12
 
