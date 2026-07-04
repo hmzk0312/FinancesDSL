@@ -1,6 +1,7 @@
 import React from 'react'
 import { ActualObservation } from '../../domain/observation'
 import { SimulationResult } from '../../domain/simulation'
+import { buildGraphData } from '../../engine/graphData'
 
 type Props = {
   results: SimulationResult[]
@@ -14,10 +15,8 @@ const lineColors = ['#2563eb', '#10b981', '#f97316', '#8b5cf6', '#ec4899']
 export const ScenarioGraph = ({ results, observation, activeScenarioId, scenarioNames }: Props) => {
   const [hiddenScenarios, setHiddenScenarios] = React.useState<Record<string, boolean>>({})
 
-  const displayedResults = results.filter((result) => !hiddenScenarios[result.scenarioId])
-  const activeResults = displayedResults.length > 0 ? displayedResults : results
-  const allStates = activeResults.flatMap((result) => result.states)
-  if (allStates.length === 0) {
+  const graphData = buildGraphData(results, scenarioNames)
+  if (graphData.series.length === 0) {
     return <p>シミュレーションデータがありません。</p>
   }
 
@@ -32,28 +31,22 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
     }))
   }
 
-  const allValues = allStates.map((state) => state.metrics.totalAssets)
-  const minValue = Math.min(...allValues)
-  const maxValue = Math.max(...allValues)
-  const range = maxValue - minValue || 1
+  const displayedSeries = graphData.series.filter((item) => !hiddenScenarios[item.scenarioId])
+  const seriesToRender = displayedSeries.length > 0 ? displayedSeries : graphData.series
+  const range = graphData.maxValue - graphData.minValue || 1
 
-  const toPoint = (index: number, statesLength: number, value: number) => {
-    const x = padding + (index / (statesLength - 1 || 1)) * (viewWidth - padding * 2)
-    const y = viewHeight - padding - ((value - minValue) / range) * (viewHeight - padding * 2)
+  const toPoint = (index: number, points: typeof graphData.series[0]['points'], value: number) => {
+    const x = padding + (index / (points.length - 1 || 1)) * (viewWidth - padding * 2)
+    const y = viewHeight - padding - ((value - graphData.minValue) / range) * (viewHeight - padding * 2)
     return { x, y }
   }
 
-  const xTicks = 5
-  const xTickIndexes = Array.from({ length: xTicks }, (_, idx) =>
-    Math.floor((idx / (xTicks - 1)) * (results[0].states.length - 1)),
+  const xTickIndexes = graphData.xLabels.map((_, idx) =>
+    Math.floor((idx / (graphData.xLabels.length - 1 || 1)) * ((graphData.series[0]?.points.length ?? 1) - 1)),
   )
+  const yTickValues = graphData.yValues
 
-  const yTicks = 5
-  const yTickValues = Array.from({ length: yTicks }, (_, idx) =>
-    Math.round(minValue + (idx / (yTicks - 1)) * range),
-  )
-
-  const observedIndex = results[0].states.findIndex((state) => state.month === observation.observedAt)
+  const observedIndex = graphData.series[0]?.points.findIndex((point) => point.month === observation.observedAt) ?? -1
   const observedX =
     observedIndex >= 0
       ? padding + (observedIndex / (results[0].states.length - 1 || 1)) * (viewWidth - padding * 2)
@@ -94,7 +87,7 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
           />
 
           {yTickValues.map((value) => {
-            const y = viewHeight - padding - ((value - minValue) / range) * (viewHeight - padding * 2)
+            const y = viewHeight - padding - ((value - graphData.minValue) / range) * (viewHeight - padding * 2)
             return (
               <g key={value}>
                 <line x1={padding - 6} y1={y} x2={padding} y2={y} stroke="#9ca3af" />
@@ -105,11 +98,12 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
             )
           })}
 
-          {xTickIndexes.map((tickIndex) => {
-            const x = padding + (tickIndex / (results[0].states.length - 1 || 1)) * (viewWidth - padding * 2)
-            const label = results[0].states[tickIndex]?.month ?? ''
+          {graphData.xLabels.map((label, index) => {
+            const position = xTickIndexes[index]
+            const pointsLength = graphData.series[0]?.points.length ?? 1
+            const x = padding + (position / (pointsLength - 1 || 1)) * (viewWidth - padding * 2)
             return (
-              <g key={tickIndex}>
+              <g key={index}>
                 <line x1={x} y1={viewHeight - padding} x2={x} y2={viewHeight - padding + 6} stroke="#9ca3af" />
                 <text x={x} y={viewHeight - padding + 20} textAnchor="middle" fontSize="12" fill="#374151">
                   {label.slice(0, 7)}
@@ -118,22 +112,20 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
             )
           })}
 
-          {results.map((result, index) => {
-            if (hiddenScenarios[result.scenarioId]) return null
-
-            const pathData = result.states
-              .map((state, stateIndex) => {
-                const { x, y } = toPoint(stateIndex, result.states.length, state.metrics.totalAssets)
-                return `${stateIndex === 0 ? 'M' : 'L'} ${x} ${y}`
+          {seriesToRender.map((seriesItem, index) => {
+            const pathData = seriesItem.points
+              .map((point, pointIndex) => {
+                const { x, y } = toPoint(pointIndex, seriesItem.points, point.totalAssets)
+                return `${pointIndex === 0 ? 'M' : 'L'} ${x} ${y}`
               })
               .join(' ')
 
-            const isActive = result.scenarioId === activeScenarioId
+            const isActive = seriesItem.scenarioId === activeScenarioId
             const color = lineColors[index % lineColors.length]
 
             return (
               <path
-                key={result.scenarioId}
+                key={seriesItem.scenarioId}
                 d={pathData}
                 fill="none"
                 stroke={color}

@@ -24,6 +24,7 @@ const getAgeAtMonth = (birthDate: string, yearMonth: string) => {
   return age
 }
 
+// Convert annual return to a fixed monthly rate for simple monthly compounding.
 const monthlyRate = (annualRate: number) => annualRate / 12
 
 const getAgeParts = (birthDate: string, yearMonth: string) => {
@@ -94,6 +95,7 @@ const overlayObservation = (
   state: SimulationState,
   observation: ActualObservation | undefined,
 ) => {
+  // Overlay only the observed assets; unobserved assets continue with existing simulated state.
   if (!observation) return state
   const cashAsset = observation.assets.find((asset) => asset.asset_id === 'cash')
   const investmentAsset = observation.assets.find((asset) => asset.asset_id === 'investment')
@@ -159,6 +161,8 @@ export const runSimulation = (
   const investmentReturnRate =
     scenario.assets.find((asset) => asset.asset_id === 'investment')?.return_profile.annual_rate ?? 0
 
+  // Simulate month by month in deterministic order: overlay actual observations, apply cashflow,
+  // apply investment return, then compute derived metrics and alerts.
   for (let i = 0; i < months; i += 1) {
     const observation = findObservation(observations, currentMonth)
     const overlaidState: SimulationState = overlayObservation(
