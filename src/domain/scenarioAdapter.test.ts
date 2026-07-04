@@ -9,13 +9,24 @@ describe('Scenario Adapter', () => {
       name: 'Adapter Test',
       retirementAge: 65,
       inflationRate: 0.03,
-      annualReturnRate: 0.08,
       monthlyExpense: 150000,
       monthlyInvestment: 250000,
-      initialAssets: {
-        cash: 2000000,
-        investment: 8000000,
-      },
+      assets: [
+        {
+          asset_id: 'cash',
+          market_value: 2000000,
+          liquidity_profile: 'cash',
+          tax_profile: 'none',
+          return_profile: { type: 'fixed', annual_rate: 0 },
+        },
+        {
+          asset_id: 'investment',
+          market_value: 8000000,
+          liquidity_profile: 'liquid',
+          tax_profile: 'capital_gains',
+          return_profile: { type: 'fixed', annual_rate: 0.08 },
+        },
+      ],
     }
 
     const scenario = toScenario(formValues)

@@ -3,13 +3,9 @@ export type ScenarioFormValues = {
   name: string
   retirementAge: number
   inflationRate: number
-  annualReturnRate: number
   monthlyExpense: number
   monthlyInvestment: number
-  initialAssets: {
-    cash: number
-    investment: number
-  }
+  assets: Asset[]
   transferEvents?: TransferEvent[]
   stateTransitions?: StateTransition[]
   alertRules?: AlertRule[]

@@ -9,13 +9,24 @@ const baseScenario: ScenarioFormValues = {
   name: 'Test Scenario',
   retirementAge: 60,
   inflationRate: 0.02,
-  annualReturnRate: 0.12,
   monthlyExpense: 100000,
   monthlyInvestment: 200000,
-  initialAssets: {
-    cash: 1000000,
-    investment: 5000000,
-  },
+  assets: [
+    {
+      asset_id: 'cash',
+      market_value: 1000000,
+      liquidity_profile: 'cash',
+      tax_profile: 'none',
+      return_profile: { type: 'fixed', annual_rate: 0 },
+    },
+    {
+      asset_id: 'investment',
+      market_value: 5000000,
+      liquidity_profile: 'liquid',
+      tax_profile: 'capital_gains',
+      return_profile: { type: 'fixed', annual_rate: 0.12 },
+    },
+  ],
 }
 
 describe('Simulation Engine', () => {

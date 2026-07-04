@@ -43,24 +43,10 @@ export const toScenario = (values: ScenarioFormValues): Scenario => ({
     inflation_rate: values.inflationRate,
     simulation_start_month: DEFAULT_SCENARIO.assumptions.simulation_start_month,
   },
-  assets: [
-    {
-      ...DEFAULT_SCENARIO.assets[0],
-      market_value: values.initialAssets.cash,
-      return_profile: {
-        type: 'fixed',
-        annual_rate: 0,
-      },
-    },
-    {
-      ...DEFAULT_SCENARIO.assets[1],
-      market_value: values.initialAssets.investment,
-      return_profile: {
-        type: 'fixed',
-        annual_rate: values.annualReturnRate,
-      },
-    },
-  ],
+  assets: values.assets.map((asset) => ({
+    ...DEFAULT_SCENARIO.assets.find((defaultAsset) => defaultAsset.asset_id === asset.asset_id),
+    ...asset,
+  })),
   transfer_events: values.transferEvents ?? [],
   state_transitions: values.stateTransitions ?? [],
   alert_rules: values.alertRules ?? [],
