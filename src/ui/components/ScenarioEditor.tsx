@@ -403,7 +403,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <label style={styles.label}>Condition Target</label>
                 <input
                   type="text"
-                  value={transition.condition.value.target.id}
+                  value={transition.condition.value?.target.id ?? ''}
                   onChange={(e) => {
                     const next = [...(value.stateTransitions ?? [])];
                     next[index] = {
@@ -411,8 +411,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                       condition: {
                         ...transition.condition,
                         value: {
-                          ...transition.condition.value,
-                          target: { ...transition.condition.value.target, id: e.target.value },
+                          target: { type: 'metric', id: e.target.value },
+                          operator: transition.condition.value?.operator ?? 'gte',
+                          value: transition.condition.value?.value ?? 0,
                         },
                       },
                     };
@@ -424,7 +425,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
               <div>
                 <label style={styles.label}>Operator</label>
                 <select
-                  value={transition.condition.value.operator}
+                  value={transition.condition.value?.operator ?? 'gte'}
                   onChange={(e) => {
                     const next = [...(value.stateTransitions ?? [])];
                     next[index] = {
@@ -432,8 +433,12 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                       condition: {
                         ...transition.condition,
                         value: {
-                          ...transition.condition.value,
+                          target: transition.condition.value?.target ?? {
+                            type: 'metric',
+                            id: 'total_assets',
+                          },
                           operator: e.target.value as 'eq' | 'gte' | 'lte',
+                          value: transition.condition.value?.value ?? 0,
                         },
                       },
                     };
@@ -450,14 +455,21 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <label style={styles.label}>Value</label>
                 <input
                   type="number"
-                  value={transition.condition.value.value}
+                  value={transition.condition.value?.value ?? 0}
                   onChange={(e) => {
                     const next = [...(value.stateTransitions ?? [])];
                     next[index] = {
                       ...transition,
                       condition: {
                         ...transition.condition,
-                        value: { ...transition.condition.value, value: Number(e.target.value) },
+                        value: {
+                          target: transition.condition.value?.target ?? {
+                            type: 'metric',
+                            id: 'total_assets',
+                          },
+                          operator: transition.condition.value?.operator ?? 'gte',
+                          value: Number(e.target.value),
+                        },
                       },
                     };
                     updateStateTransitions(next);

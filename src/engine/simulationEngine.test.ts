@@ -51,9 +51,13 @@ describe('Simulation Engine', () => {
     const result = runSimulation(
       {
         ...baseScenario,
-        annualReturnRate: 0.12,
         monthlyExpense: 0,
         monthlyInvestment: 0,
+        assets: baseScenario.assets.map((asset) =>
+          asset.asset_id === 'investment'
+            ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0.12 } }
+            : asset
+        ),
       },
       [],
       1
@@ -98,9 +102,13 @@ describe('Simulation Engine', () => {
   it('applies transfer_events to asset balances before monthly return', () => {
     const scenarioWithTransfer: ScenarioFormValues = {
       ...baseScenario,
-      annualReturnRate: 0,
       monthlyExpense: 0,
       monthlyInvestment: 0,
+      assets: baseScenario.assets.map((asset) =>
+        asset.asset_id === 'investment'
+          ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0 } }
+          : asset
+      ),
       transferEvents: [
         {
           id: 'cash-to-investment',
@@ -127,7 +135,11 @@ describe('Simulation Engine', () => {
       ...baseScenario,
       monthlyExpense: 0,
       monthlyInvestment: 0,
-      annualReturnRate: 0,
+      assets: baseScenario.assets.map((asset) =>
+        asset.asset_id === 'investment'
+          ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0 } }
+          : asset
+      ),
       stateTransitions: [
         {
           id: 'reach-goal',
@@ -166,7 +178,11 @@ describe('Simulation Engine', () => {
         ...baseScenario,
         monthlyExpense: 0,
         monthlyInvestment: 0,
-        annualReturnRate: 0,
+        assets: baseScenario.assets.map((asset) =>
+          asset.asset_id === 'investment'
+            ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0 } }
+            : asset
+        ),
       },
       [observation],
       1

@@ -10,8 +10,18 @@ const sampleResult: SimulationResult = {
       age: { years: 46, months: 5 },
       states: { simulation: 'active', observation: 'none' },
       assets: {
-        cash: { asset_id: 'cash', market_value: 1000000 },
-        investment: { asset_id: 'investment', market_value: 2000000 },
+        cash: {
+          asset_id: 'cash',
+          market_value: 1000000,
+          liquidity_profile: 'cash',
+          tax_profile: 'none',
+        },
+        investment: {
+          asset_id: 'investment',
+          market_value: 2000000,
+          liquidity_profile: 'liquid',
+          tax_profile: 'capital_gains',
+        },
       },
       metrics: { total_assets: 3000000 },
       alerts: [],
@@ -21,8 +31,18 @@ const sampleResult: SimulationResult = {
       age: { years: 46, months: 6 },
       states: { simulation: 'active', observation: 'none' },
       assets: {
-        cash: { asset_id: 'cash', market_value: 900000 },
-        investment: { asset_id: 'investment', market_value: 2140000 },
+        cash: {
+          asset_id: 'cash',
+          market_value: 900000,
+          liquidity_profile: 'cash',
+          tax_profile: 'none',
+        },
+        investment: {
+          asset_id: 'investment',
+          market_value: 2140000,
+          liquidity_profile: 'liquid',
+          tax_profile: 'capital_gains',
+        },
       },
       metrics: { total_assets: 3040000 },
       alerts: [],
