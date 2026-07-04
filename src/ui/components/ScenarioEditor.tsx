@@ -24,9 +24,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
 
   return (
     <div>
-      <h2>Scenario Editor</h2>
+      <h2>シナリオ編集</h2>
       <div style={styles.field}>
-        <label style={styles.label}>Base Scenario</label>
+        <label style={styles.label}>ベースシナリオ</label>
         <select
           value={value.id}
           onChange={(event) => {
@@ -44,7 +44,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
       </div>
 
       <div style={styles.field}>
-        <label style={styles.label}>Retirement Age</label>
+        <label style={styles.label}>リタイア年齢</label>
         <input
           type="number"
           value={value.retirementAge}
@@ -55,7 +55,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
       </div>
 
       <div style={styles.field}>
-        <label style={styles.label}>Inflation Rate</label>
+        <label style={styles.label}>インフレ率</label>
         <input
           type="number"
           step="0.001"
@@ -66,7 +66,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
       </div>
 
       <div style={styles.field}>
-        <label style={styles.label}>Annual Return Rate</label>
+        <label style={styles.label}>年間リターン率</label>
         <input
           type="number"
           step="0.001"
@@ -77,7 +77,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
       </div>
 
       <div style={styles.field}>
-        <label style={styles.label}>Monthly Expense</label>
+        <label style={styles.label}>月次支出</label>
         <input
           type="number"
           value={value.monthlyExpense}
@@ -87,7 +87,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
       </div>
 
       <div style={styles.field}>
-        <label style={styles.label}>Monthly Investment</label>
+        <label style={styles.label}>月次投資額</label>
         <input
           type="number"
           value={value.monthlyInvestment}
@@ -98,7 +98,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
 
       <div style={styles.grid}>
         <div style={styles.box}>
-          <label style={styles.label}>Initial Cash</label>
+          <label style={styles.label}>初期現金</label>
           <input
             type="number"
             value={value.initialAssets.cash}
@@ -107,7 +107,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
           />
         </div>
         <div style={styles.box}>
-          <label style={styles.label}>Initial Investment</label>
+          <label style={styles.label}>初期投資資産</label>
           <input
             type="number"
             value={value.initialAssets.investment}
