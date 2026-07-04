@@ -25,7 +25,9 @@ Scenario
 
 ## assumptions
 
-シミュレーション全体で利用する共通設定。
+シミュレーション全体に一つだけ存在する前提条件であり共通設定。
+
+Asset固有の性質やTransferEvent固有の設定は置かない。
 
 例
 
@@ -42,11 +44,15 @@ Scenario
 
 資産残高は Transfer Event と運用利回りによって変化する。
 
+- `type` は使わない。
+- `return_profile` で利回りを定義する。
+- `return_profile` は `type: fixed` と `annual_rate: number` の最小仕様を持つ。
+
 ---
 
 ## transfer_events
 
-毎月実行される資産移動ルール。
+毎月評価される資産移動ルール。
 
 例
 
@@ -56,6 +62,12 @@ Scenario
 - 資産取り崩し
 
 Transfer Event は YAML の定義順に逐次適用される。
+
+- `id` を持つ。
+- `amount.type` は `fixed` または `inflation_adjusted`。
+- `schedule.type` は `once` / `monthly` / `yearly`。
+- `condition` は `state` / `age` / `value` を持ち、すべて AND で評価する。
+- 条件不成立時は skip する。
 
 ---
 
@@ -68,7 +80,9 @@ Transfer Event は YAML の定義順に逐次適用される。
 - retired
 - pension_started
 
-条件を満たした場合、一度だけ状態を変更する。
+- `id` を持つ。
+- `when` ではなく `condition` を使う。
+- 条件を満たした場合に一度だけ状態を更新する。
 
 ---
 
@@ -81,6 +95,11 @@ SimulationResult に対する判定ルール。
 - 現金不足
 - FIRE達成
 - 資産枯渇
+
+- `id` を持つ。
+- `purpose` を使う。
+- `target` は `type` と `id` で参照する。
+- `condition` は `eq` / `gte` / `lte` を使う。
 
 Alert はシミュレーションを停止しない。
 
@@ -109,31 +128,38 @@ assumptions:
 
 assets:
   - asset_id: cash
-    type: cash
     market_value: 5000000
 
 transfer_events:
-  - name: salary
+  - id: salary
     from: external
     to: cash
     amount:
       type: fixed
       value: 400000
     schedule:
-      monthly: true
+      type: monthly
 
 state_transitions:
-  - state: retired
-    when:
-      age_gte: 60
+  - id: retired_at_60
+    state: retired
+    condition:
+      age:
+        gte: 60
 
 alert_rules:
-  - name: cash_shortage
+  - id: cash_shortage
     target:
       type: metric
-      key: cash_total
+      id: cash_total
     condition:
-      lte: 0
+      value:
+        target:
+          type: metric
+          id: cash_total
+        operator: lte
+        value: 0
+    purpose: warning
 ```
 
 ---

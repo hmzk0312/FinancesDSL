@@ -90,6 +90,10 @@ Alerts
 * ActualObservation は Scenario に直接紐づけない
 * ActualObservation は Source of Truth の一つである
 * SimulationResult は保存せず、Scenario と ActualObservation から再生成する
+* Simulation は `Scenario.assumptions.simulation_start_month` から開始する
+* 開始月に ActualObservation が存在する場合は月初に overlay する
+* Observation がない Asset は `Scenario.assets` の `market_value` / `cost_basis` を初期値として使う
+* 以後、該当月の ActualObservation があれば毎月 overlay する
 
 ---
 
