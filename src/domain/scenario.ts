@@ -10,6 +10,8 @@ export type ScenarioFormValues = {
     cash: number
     investment: number
   }
+  transferEvents?: TransferEvent[]
+  stateTransitions?: StateTransition[]
 }
 
 export type RateProfile = {

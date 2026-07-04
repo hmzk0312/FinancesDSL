@@ -61,7 +61,7 @@ export const toScenario = (values: ScenarioFormValues): Scenario => ({
       },
     },
   ],
-  transfer_events: [],
-  state_transitions: [],
+  transfer_events: values.transferEvents ?? [],
+  state_transitions: values.stateTransitions ?? [],
   alert_rules: [],
 })

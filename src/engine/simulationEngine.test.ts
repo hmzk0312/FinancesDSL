@@ -66,4 +66,59 @@ describe('Simulation Engine', () => {
     const state = result.states[0]
     expect(state.metrics.totalAssets).toBe(state.assets.cash.market_value + state.assets.investment.market_value)
   })
+
+  it('applies transfer_events to asset balances before monthly return', () => {
+    const scenarioWithTransfer: ScenarioFormValues = {
+      ...baseScenario,
+      annualReturnRate: 0,
+      monthlyExpense: 0,
+      monthlyInvestment: 0,
+      transferEvents: [
+        {
+          id: 'cash-to-investment',
+          from: 'cash',
+          to: 'investment',
+          amount: {
+            type: 'fixed',
+            value: 100000,
+          },
+          schedule: {
+            type: 'monthly',
+          },
+        },
+      ],
+    }
+
+    const result = runSimulation(scenarioWithTransfer, [], 1)
+    expect(result.states[0].assets.cash.market_value).toBe(900000)
+    expect(result.states[0].assets.investment.market_value).toBe(5100000)
+  })
+
+  it('applies state_transitions when value condition matches', () => {
+    const scenarioWithTransition: ScenarioFormValues = {
+      ...baseScenario,
+      monthlyExpense: 0,
+      monthlyInvestment: 0,
+      annualReturnRate: 0,
+      stateTransitions: [
+        {
+          id: 'reach-goal',
+          state: 'retired',
+          condition: {
+            value: {
+              target: {
+                type: 'metric',
+                id: 'totalAssets',
+              },
+              operator: 'gte',
+              value: 6000000,
+            },
+          },
+        },
+      ],
+    }
+
+    const result = runSimulation(scenarioWithTransition, [], 1)
+    expect(result.states[0].states.simulation).toBe('retired')
+  })
 })
