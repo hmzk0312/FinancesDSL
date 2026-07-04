@@ -2,11 +2,18 @@ export type AssetState = {
   asset_id: string
   market_value: number
   cost_basis?: number
+  liquidity_profile: 'cash' | 'liquid' | 'restricted'
+  tax_profile: 'none' | 'tax_free' | 'capital_gains' | 'retirement_income'
+}
+
+export type AlertTarget = {
+  type: 'metric' | 'asset'
+  id: string
 }
 
 export type Alert = {
   id: string
-  target: string
+  target: AlertTarget
   operator: 'eq' | 'gte' | 'lte'
   value: number
   message: string

@@ -13,7 +13,7 @@ const sampleResult: SimulationResult = {
         cash: { asset_id: 'cash', market_value: 1000000 },
         investment: { asset_id: 'investment', market_value: 2000000 },
       },
-      metrics: { totalAssets: 3000000 },
+      metrics: { total_assets: 3000000 },
       alerts: [],
     },
     {
@@ -24,7 +24,7 @@ const sampleResult: SimulationResult = {
         cash: { asset_id: 'cash', market_value: 900000 },
         investment: { asset_id: 'investment', market_value: 2140000 },
       },
-      metrics: { totalAssets: 3040000 },
+      metrics: { total_assets: 3040000 },
       alerts: [],
     },
   ],

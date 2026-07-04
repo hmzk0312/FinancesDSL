@@ -64,7 +64,7 @@ describe('Simulation Engine', () => {
   it('calculates total_assets correctly based on cash and investment', () => {
     const result = runSimulation(baseScenario, [], 1)
     const state = result.states[0]
-    expect(state.metrics.totalAssets).toBe(state.assets.cash.market_value + state.assets.investment.market_value)
+    expect(state.metrics.total_assets).toBe(state.assets.cash.market_value + state.assets.investment.market_value)
   })
 
   it('applies transfer_events to asset balances before monthly return', () => {
@@ -108,7 +108,7 @@ describe('Simulation Engine', () => {
             value: {
               target: {
                 type: 'metric',
-                id: 'totalAssets',
+                id: 'total_assets',
               },
               operator: 'gte',
               value: 6000000,

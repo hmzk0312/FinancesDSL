@@ -12,6 +12,7 @@ export type ScenarioFormValues = {
   }
   transferEvents?: TransferEvent[]
   stateTransitions?: StateTransition[]
+  alertRules?: AlertRule[]
 }
 
 export type RateProfile = {

@@ -46,7 +46,7 @@ export const buildGraphData = (
     label: scenarioNames[result.scenarioId] ?? result.scenarioId,
     points: result.states.map((state) => ({
       month: state.month,
-      totalAssets: state.metrics.totalAssets,
+      totalAssets: state.metrics.total_assets,
     })),
   }))
 

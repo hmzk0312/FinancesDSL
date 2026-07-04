@@ -1,5 +1,5 @@
 import { ActualObservation } from '../domain/observation'
-import { ScenarioFormValues, StateTransition, TransferEvent } from '../domain/scenario'
+import { AlertRule, ScenarioFormValues, StateTransition, TransferEvent } from '../domain/scenario'
 import { Alert, AssetState, SimulationResult, SimulationState } from '../domain/simulation'
 import { toScenario } from '../domain/scenarioAdapter'
 
@@ -45,11 +45,60 @@ const getAgeParts = (birthDate: string, yearMonth: string) => {
 }
 
 const calculateTotalAssets = (assets: Record<string, AssetState>) =>
-  assets.cash.market_value + assets.investment.market_value
+  Object.values(assets)
+    .filter((asset) => asset.asset_id !== 'external')
+    .reduce((sum, asset) => sum + asset.market_value, 0)
+
+const calculateCashTotal = (assets: Record<string, AssetState>) =>
+  Object.values(assets)
+    .filter((asset) => asset.liquidity_profile === 'cash')
+    .reduce((sum, asset) => sum + asset.market_value, 0)
+
+const calculateLiquidAssets = (assets: Record<string, AssetState>) =>
+  Object.values(assets)
+    .filter((asset) => asset.liquidity_profile === 'cash' || asset.liquidity_profile === 'liquid')
+    .reduce((sum, asset) => sum + asset.market_value, 0)
+
+const getAfterTaxValue = (
+  asset: AssetState,
+  capitalGainsRate: number,
+) => {
+  if (asset.liquidity_profile !== 'cash' && asset.liquidity_profile !== 'liquid') {
+    return 0
+  }
+
+  if (asset.tax_profile === 'none' || asset.tax_profile === 'tax_free' || asset.tax_profile === 'retirement_income') {
+    return asset.market_value
+  }
+
+  const costBasis = asset.cost_basis ?? asset.market_value
+  const unrealizedGain = asset.market_value - costBasis
+  const taxableGain = Math.max(0, unrealizedGain)
+  const tax = taxableGain * capitalGainsRate
+  return asset.market_value - tax
+}
+
+const calculateAfterTaxLiquidAssets = (
+  assets: Record<string, AssetState>,
+  capitalGainsRate: number,
+) =>
+  Object.values(assets)
+    .filter((asset) => asset.liquidity_profile === 'cash' || asset.liquidity_profile === 'liquid')
+    .reduce((sum, asset) => sum + getAfterTaxValue(asset, capitalGainsRate), 0)
+
+const calculateMetrics = (
+  assets: Record<string, AssetState>,
+  capitalGainsRate: number,
+) => ({
+  total_assets: calculateTotalAssets(assets),
+  cash_total: calculateCashTotal(assets),
+  liquid_assets: calculateLiquidAssets(assets),
+  after_tax_liquid_assets: calculateAfterTaxLiquidAssets(assets, capitalGainsRate),
+})
 
 const buildAlert = (
   id: string,
-  target: string,
+  target: Alert['target'],
   operator: Alert['operator'],
   value: number,
   message: string,
@@ -59,6 +108,9 @@ const buildAlert = (
 const generateAlerts = (
   assets: Record<string, AssetState>,
   metrics: Record<string, number>,
+  alertRules: AlertRule[],
+  currentStates: Record<string, string>,
+  age: { years: number; months: number },
 ): Alert[] => {
   const alerts: Alert[] = []
 
@@ -66,7 +118,7 @@ const generateAlerts = (
     alerts.push(
       buildAlert(
         'negative-cash',
-        'cash',
+        { type: 'asset', id: 'cash' },
         'lte',
         0,
         'Cash balance is at or below zero.',
@@ -75,11 +127,11 @@ const generateAlerts = (
     )
   }
 
-  if (metrics.totalAssets <= 0) {
+  if (metrics.total_assets <= 0) {
     alerts.push(
       buildAlert(
         'negative-total-assets',
-        'totalAssets',
+        { type: 'metric', id: 'total_assets' },
         'lte',
         0,
         'Total assets are at or below zero.',
@@ -87,6 +139,29 @@ const generateAlerts = (
       ),
     )
   }
+
+  alertRules.forEach((rule) => {
+    if (
+      evaluateConditionForRule(
+        rule.condition,
+        currentStates,
+        age,
+        metrics,
+        assets,
+      )
+    ) {
+      alerts.push(
+        buildAlert(
+          rule.id,
+          rule.target,
+          rule.condition.value.operator,
+          rule.condition.value.value,
+          rule.message,
+          rule.purpose,
+        ),
+      )
+    }
+  })
 
   return alerts
 }
@@ -107,6 +182,8 @@ const overlayObservation = (
           asset_id: 'cash',
           market_value: cashAsset.market_value,
           cost_basis: cashAsset.cost_basis,
+          liquidity_profile: state.assets.cash.liquidity_profile,
+          tax_profile: state.assets.cash.tax_profile,
         }
       : state.assets.cash,
     investment: investmentAsset
@@ -114,6 +191,8 @@ const overlayObservation = (
           asset_id: 'investment',
           market_value: investmentAsset.market_value,
           cost_basis: investmentAsset.cost_basis,
+          liquidity_profile: state.assets.investment.liquidity_profile,
+          tax_profile: state.assets.investment.tax_profile,
         }
       : state.assets.investment,
   }
@@ -250,18 +329,20 @@ export const runSimulation = (
   let currentMonth = scenario.assumptions.simulation_start_month
   let currentAge = getAgeParts(scenario.assumptions.birth_date, currentMonth)
 
-  const initialCash = scenario.assets.find((asset) => asset.asset_id === 'cash')?.market_value ?? 0
-  const initialInvestment = scenario.assets.find((asset) => asset.asset_id === 'investment')?.market_value ?? 0
+  const buildInitialAssetState = (assetId: string): AssetState => {
+    const asset = scenario.assets.find((item) => item.asset_id === assetId)
+    return {
+      asset_id: assetId,
+      market_value: asset?.market_value ?? 0,
+      cost_basis: asset?.cost_basis,
+      liquidity_profile: asset?.liquidity_profile ?? 'cash',
+      tax_profile: asset?.tax_profile ?? 'none',
+    }
+  }
 
   let assets: Record<string, AssetState> = {
-    cash: {
-      asset_id: 'cash',
-      market_value: initialCash,
-    },
-    investment: {
-      asset_id: 'investment',
-      market_value: initialInvestment,
-    },
+    cash: buildInitialAssetState('cash'),
+    investment: buildInitialAssetState('investment'),
   }
 
   const investmentReturnRate =
@@ -300,11 +381,7 @@ export const runSimulation = (
             transition.condition,
             currentState,
             currentAge,
-            {
-              totalAssets: calculateTotalAssets(assets),
-              cashBalance: assets.cash.market_value,
-              investmentBalance: assets.investment.market_value,
-            },
+            calculateMetrics(assets, scenario.assumptions.tax_rates.capital_gains),
             assets,
           )
         ) {
@@ -322,11 +399,7 @@ export const runSimulation = (
             transferEvent.condition,
             currentState,
             currentAge,
-            {
-              totalAssets: calculateTotalAssets(nextAssets),
-              cashBalance: nextAssets.cash.market_value,
-              investmentBalance: nextAssets.investment.market_value,
-            },
+            calculateMetrics(nextAssets, scenario.assumptions.tax_rates.capital_gains),
             nextAssets,
           )
         ) {
@@ -361,14 +434,9 @@ export const runSimulation = (
       },
     }
 
-    const metrics = {
-      totalAssets: calculateTotalAssets(assets),
-      cashBalance: assets.cash.market_value,
-      investmentBalance: assets.investment.market_value,
-      monthlyReturnRate: monthlyReturn,
-    }
+    const metrics = calculateMetrics(assets, scenario.assumptions.tax_rates.capital_gains)
 
-    const alerts = generateAlerts(assets, metrics)
+    const alerts = generateAlerts(assets, metrics, scenario.alert_rules, currentState, currentAge)
 
     states.push({
       month: currentMonth,

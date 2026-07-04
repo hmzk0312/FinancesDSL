@@ -59,7 +59,7 @@ export const ScenarioGraph = ({ results, observation, activeScenarioId, scenario
         <div>
           <div style={styles.summaryLabel}>最新の総資産</div>
           <div style={styles.summaryValue}>
-            ¥{results[0].states[results[0].states.length - 1].metrics.totalAssets.toLocaleString()}
+            ¥{results[0].states[results[0].states.length - 1].metrics.total_assets.toLocaleString()}
           </div>
         </div>
         <div>
