@@ -14,13 +14,18 @@ const App = () => {
     [scenarioForm],
   )
 
+  const scenarioNames = useMemo(
+    () => Object.fromEntries(comparisonScenarios.map((scenario) => [scenario.id, scenario.name])),
+    [comparisonScenarios],
+  )
+
   const simulationResults = useSimulation(comparisonScenarios, mockObservation, 120)
 
   return (
     <div style={styles.page}>
       <header style={styles.header}>
         <h1>Finances DSL MVP</h1>
-        <p>Overlay Graph と Scenario Editor の 2 ペイン UI</p>
+        <p>オーバーレイグラフとシナリオ編集の 2 ペイン UI</p>
       </header>
       <main style={styles.main}>
         <section style={styles.graphPane}>
@@ -28,6 +33,7 @@ const App = () => {
             results={simulationResults}
             observation={mockObservation}
             activeScenarioId={scenarioForm.id}
+            scenarioNames={scenarioNames}
           />
         </section>
         <aside style={styles.editorPane}>
