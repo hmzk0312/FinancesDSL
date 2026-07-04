@@ -243,6 +243,8 @@ alert_rules:
 - `gte`
 - `lte`
 
+比較演算子は `condition.value.operator` に指定する。
+
 ---
 
 ## Validation Rules

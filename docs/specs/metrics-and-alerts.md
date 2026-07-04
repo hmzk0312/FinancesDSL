@@ -78,7 +78,7 @@ Alert Rule は以下から構成される。
 
 - target
 - condition
-- severity
+- purpose
 - message
 
 target は以下を参照できる。
