@@ -1,16 +1,28 @@
 import { describe, expect, it } from 'vitest';
 import { runSimulation } from './simulationEngine';
-import { ScenarioFormValues } from '../domain/scenario';
+import { Scenario } from '../domain/scenario';
 import { mockObservation } from '../data/mockObservation';
 import { ActualObservation } from '../domain/observation';
 
-const baseScenario: ScenarioFormValues = {
+const baseScenario: Scenario = {
   id: 'test-scenario',
   name: 'Test Scenario',
   retirementAge: 60,
   inflationRate: 0.02,
   monthlyExpense: 100000,
   monthlyInvestment: 200000,
+  assumptions: {
+    birth_date: '1980-01-01',
+    simulation_start_month: '2026-06-01',
+    simulation_end_age: 95,
+    inflation_rate: 0.02,
+    tax_rates: {
+      capital_gains: 0.2,
+    },
+  },
+  transferEvents: [],
+  stateTransitions: [],
+  alertRules: [],
   assets: [
     {
       asset_id: 'cash',
@@ -100,7 +112,7 @@ describe('Simulation Engine', () => {
   });
 
   it('applies transfer_events to asset balances before monthly return', () => {
-    const scenarioWithTransfer: ScenarioFormValues = {
+    const scenarioWithTransfer: Scenario = {
       ...baseScenario,
       monthlyExpense: 0,
       monthlyInvestment: 0,
@@ -131,7 +143,7 @@ describe('Simulation Engine', () => {
   });
 
   it('applies state_transitions when value condition matches', () => {
-    const scenarioWithTransition: ScenarioFormValues = {
+    const scenarioWithTransition: Scenario = {
       ...baseScenario,
       monthlyExpense: 0,
       monthlyInvestment: 0,

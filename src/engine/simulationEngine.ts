@@ -1,5 +1,5 @@
 import { ActualObservation } from '../domain/observation';
-import { AlertRule, ScenarioFormValues, StateTransition, TransferEvent } from '../domain/scenario';
+import { AlertRule, Scenario, StateTransition, TransferEvent } from '../domain/scenario';
 import { Alert, AssetState, SimulationResult, SimulationState } from '../domain/simulation';
 import { toScenario } from '../domain/scenarioAdapter';
 
@@ -130,12 +130,14 @@ const generateAlerts = (
 
   alertRules.forEach((rule) => {
     if (evaluateConditionForRule(rule.condition, currentStates, age, metrics, assets)) {
+      const ruleValue = rule.condition.value;
+      if (!ruleValue) return;
       alerts.push(
         buildAlert(
           rule.id,
-          rule.target,
-          rule.condition.value.operator,
-          rule.condition.value.value,
+          ruleValue.target,
+          ruleValue.operator,
+          ruleValue.value,
           rule.message,
           rule.purpose
         )
@@ -285,7 +287,7 @@ const findObservation = (observations: ActualObservation[], yearMonth: string) =
 };
 
 export const runSimulation = (
-  scenarioForm: ScenarioFormValues,
+  scenarioForm: Scenario,
   observations: ActualObservation[],
   months = 120
 ): SimulationResult => {
@@ -341,8 +343,8 @@ export const runSimulation = (
       observation: observation ? 'overlaid' : 'none',
     };
 
-    if (scenario.state_transitions.length > 0) {
-      scenario.state_transitions.forEach((transition) => {
+    if (scenario.stateTransitions.length > 0) {
+      scenario.stateTransitions.forEach((transition) => {
         if (
           evaluateConditionForRule(
             transition.condition,
@@ -358,8 +360,8 @@ export const runSimulation = (
     }
 
     let nextAssets = assets;
-    if (scenario.transfer_events.length > 0) {
-      scenario.transfer_events.forEach((transferEvent) => {
+    if (scenario.transferEvents.length > 0) {
+      scenario.transferEvents.forEach((transferEvent) => {
         if (
           scheduleMatches(
             transferEvent.schedule,
@@ -403,7 +405,7 @@ export const runSimulation = (
 
     const metrics = calculateMetrics(assets, scenario.assumptions.tax_rates.capital_gains);
 
-    const alerts = generateAlerts(assets, metrics, scenario.alert_rules, currentState, currentAge);
+    const alerts = generateAlerts(assets, metrics, scenario.alertRules, currentState, currentAge);
 
     states.push({
       month: currentMonth,

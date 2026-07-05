@@ -4,10 +4,10 @@ import { mockObservation } from '../data/mockObservation';
 import { ScenarioEditor } from './components/ScenarioEditor';
 import { ScenarioGraph } from './components/ScenarioGraph';
 import { useSimulation } from './hooks/useSimulation';
-import { ScenarioFormValues } from '../domain/scenario';
+import { Scenario } from '../domain/scenario';
 
 const App = () => {
-  const [scenarioForm, setScenarioForm] = useState<ScenarioFormValues>(mockScenarios[0]);
+  const [scenarioForm, setScenarioForm] = useState<Scenario>(mockScenarios[0]);
 
   const comparisonScenarios = useMemo(
     () =>

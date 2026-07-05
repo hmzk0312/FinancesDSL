@@ -64,18 +64,14 @@ ActualObservation は全 Asset を必ず含む必要はない。記録された 
 
 ActualObservation は Simulation の月次処理の最初に反映される。
 
-```text
-ActualObservation
-↓
-State Transition
-↓
-Transfer Events
-↓
-Investment Return
-↓
-Metrics
-↓
-Alerts
+```mermaid
+graph TD;　
+
+A[ActualObservation\n実際の観測値] --> B[State Transition\n状態遷移ルールの評価]
+B --> C[Transfer Events\n資産移動ルールの評価]
+C --> D[Investment Return\n投資資産へ運用利回りを適用]
+D --> E[Metrics\n読み取り専用の値]
+E --> F[Alerts\n]
 ```
 
 この反映処理を Overlay と呼ぶ。

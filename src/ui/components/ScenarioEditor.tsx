@@ -1,16 +1,10 @@
 import React from 'react';
-import {
-  ScenarioFormValues,
-  Asset,
-  TransferEvent,
-  StateTransition,
-  AlertRule,
-} from '../../domain/scenario';
+import { Scenario, Asset, TransferEvent, StateTransition, AlertRule } from '../../domain/scenario';
 
 type Props = {
-  scenarios: ScenarioFormValues[];
-  value: ScenarioFormValues;
-  onChange: (value: ScenarioFormValues) => void;
+  scenarios: Scenario[];
+  value: Scenario;
+  onChange: (value: Scenario) => void;
 };
 
 const defaultAsset: Asset = {
@@ -43,7 +37,6 @@ const defaultStateTransition: StateTransition = {
 
 const defaultAlertRule: AlertRule = {
   id: '',
-  target: { type: 'metric', id: 'total_assets' },
   condition: {
     value: {
       target: { type: 'metric', id: 'total_assets' },
@@ -56,10 +49,7 @@ const defaultAlertRule: AlertRule = {
 };
 
 export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
-  const updateField = <K extends keyof ScenarioFormValues>(
-    key: K,
-    nextValue: ScenarioFormValues[K]
-  ) => {
+  const updateField = <K extends keyof Scenario>(key: K, nextValue: Scenario[K]) => {
     onChange({ ...value, [key]: nextValue });
   };
 
@@ -538,12 +528,19 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <label style={styles.label}>Target</label>
                 <input
                   type="text"
-                  value={rule.target.id}
+                  value={rule.condition.value?.target.id ?? ''}
                   onChange={(e) => {
                     const next = [...(value.alertRules ?? [])];
                     next[index] = {
                       ...rule,
-                      target: { ...rule.target, id: e.target.value },
+                      condition: {
+                        ...rule.condition,
+                        value: {
+                          target: { type: 'metric', id: e.target.value },
+                          operator: rule.condition.value?.operator ?? 'eq',
+                          value: rule.condition.value?.value ?? 0,
+                        },
+                      },
                     };
                     updateAlertRules(next);
                   }}
@@ -553,7 +550,7 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
               <div>
                 <label style={styles.label}>Condition Operator</label>
                 <select
-                  value={rule.condition.value.operator}
+                  value={rule.condition.value?.operator ?? 'eq'}
                   onChange={(e) => {
                     const next = [...(value.alertRules ?? [])];
                     next[index] = {
@@ -561,8 +558,12 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                       condition: {
                         ...rule.condition,
                         value: {
-                          ...rule.condition.value,
+                          target: rule.condition.value?.target ?? {
+                            type: 'metric',
+                            id: 'total_assets',
+                          },
                           operator: e.target.value as 'eq' | 'gte' | 'lte',
+                          value: rule.condition.value?.value ?? 0,
                         },
                       },
                     };
@@ -579,14 +580,21 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
                 <label style={styles.label}>Value</label>
                 <input
                   type="number"
-                  value={rule.condition.value.value}
+                  value={rule.condition.value?.value ?? 0}
                   onChange={(e) => {
                     const next = [...(value.alertRules ?? [])];
                     next[index] = {
                       ...rule,
                       condition: {
                         ...rule.condition,
-                        value: { ...rule.condition.value, value: Number(e.target.value) },
+                        value: {
+                          target: rule.condition.value?.target ?? {
+                            type: 'metric',
+                            id: 'total_assets',
+                          },
+                          operator: rule.condition.value?.operator ?? 'eq',
+                          value: Number(e.target.value),
+                        },
                       },
                     };
                     updateAlertRules(next);

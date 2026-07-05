@@ -1,16 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { ScenarioFormValues } from './scenario';
+import { Scenario } from './scenario';
 import { toScenario } from './scenarioAdapter';
 
 describe('Scenario Adapter', () => {
   it('converts form values to a Scenario with equivalent assumptions and assets', () => {
-    const formValues: ScenarioFormValues = {
+    const formValues: Scenario = {
       id: 'adapter-test',
       name: 'Adapter Test',
       retirementAge: 65,
       inflationRate: 0.03,
       monthlyExpense: 150000,
       monthlyInvestment: 250000,
+      assumptions: {
+        birth_date: '1980-01-01',
+        simulation_start_month: '2026-06-01',
+        simulation_end_age: 95,
+        inflation_rate: 0.03,
+        tax_rates: {
+          capital_gains: 0.2,
+        },
+      },
+      transferEvents: [],
+      stateTransitions: [],
+      alertRules: [],
       assets: [
         {
           asset_id: 'cash',

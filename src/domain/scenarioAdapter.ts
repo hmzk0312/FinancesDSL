@@ -1,15 +1,12 @@
-import { Scenario, ScenarioFormValues } from './scenario';
+import { Scenario } from './scenario';
 
 export const DEFAULT_SCENARIO: Scenario = {
-  assumptions: {
-    birth_date: '1980-01-01',
-    simulation_start_month: '2026-06-01',
-    simulation_end_age: 95,
-    inflation_rate: 0.02,
-    tax_rates: {
-      capital_gains: 0.2,
-    },
-  },
+  id: 'default',
+  name: 'Default Scenario',
+  retirementAge: 65,
+  inflationRate: 0.02,
+  monthlyExpense: 0,
+  monthlyInvestment: 0,
   assets: [
     {
       asset_id: 'cash',
@@ -32,14 +29,25 @@ export const DEFAULT_SCENARIO: Scenario = {
       },
     },
   ],
-  transfer_events: [],
-  state_transitions: [],
-  alert_rules: [],
+  transferEvents: [],
+  stateTransitions: [],
+  alertRules: [],
+  assumptions: {
+    birth_date: '1980-01-01',
+    simulation_start_month: '2026-06-01',
+    simulation_end_age: 95,
+    inflation_rate: 0.02,
+    tax_rates: {
+      capital_gains: 0.2,
+    },
+  },
 };
 
-export const toScenario = (values: ScenarioFormValues): Scenario => ({
+export const toScenario = (values: Scenario): Scenario => ({
+  ...values,
   assumptions: {
     ...DEFAULT_SCENARIO.assumptions,
+    ...values.assumptions,
     inflation_rate: values.inflationRate,
     simulation_start_month: DEFAULT_SCENARIO.assumptions.simulation_start_month,
   },
@@ -47,7 +55,7 @@ export const toScenario = (values: ScenarioFormValues): Scenario => ({
     ...DEFAULT_SCENARIO.assets.find((defaultAsset) => defaultAsset.asset_id === asset.asset_id),
     ...asset,
   })),
-  transfer_events: values.transferEvents ?? [],
-  state_transitions: values.stateTransitions ?? [],
-  alert_rules: values.alertRules ?? [],
+  transferEvents: values.transferEvents ?? [],
+  stateTransitions: values.stateTransitions ?? [],
+  alertRules: values.alertRules ?? [],
 });

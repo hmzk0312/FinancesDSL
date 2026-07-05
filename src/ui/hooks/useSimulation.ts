@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { ActualObservation } from '../../domain/observation';
-import { ScenarioFormValues } from '../../domain/scenario';
+import { Scenario } from '../../domain/scenario';
 import { SimulationResult } from '../../domain/simulation';
 import { runSimulation } from '../../engine/simulationEngine';
 
 export const useSimulation = (
-  scenarios: ScenarioFormValues[],
+  scenarios: Scenario[],
   observation: ActualObservation,
   months = 120
 ): SimulationResult[] => {

@@ -1,6 +1,6 @@
-import { ScenarioFormValues } from '../domain/scenario';
+import { Scenario } from '../domain/scenario';
 
-export const mockScenarios: ScenarioFormValues[] = [
+export const mockScenarios: Scenario[] = [
   {
     id: 'scenario-1',
     name: 'Base Case',
@@ -8,6 +8,18 @@ export const mockScenarios: ScenarioFormValues[] = [
     inflationRate: 0.02,
     monthlyExpense: 300000,
     monthlyInvestment: 100000,
+    assumptions: {
+      birth_date: '1980-01-01',
+      simulation_start_month: '2026-06-01',
+      simulation_end_age: 95,
+      inflation_rate: 0.02,
+      tax_rates: {
+        capital_gains: 0.2,
+      },
+    },
+    transferEvents: [],
+    stateTransitions: [],
+    alertRules: [],
     assets: [
       {
         asset_id: 'cash',
@@ -32,6 +44,18 @@ export const mockScenarios: ScenarioFormValues[] = [
     inflationRate: 0.03,
     monthlyExpense: 320000,
     monthlyInvestment: 80000,
+    assumptions: {
+      birth_date: '1980-01-01',
+      simulation_start_month: '2026-06-01',
+      simulation_end_age: 95,
+      inflation_rate: 0.03,
+      tax_rates: {
+        capital_gains: 0.2,
+      },
+    },
+    transferEvents: [],
+    stateTransitions: [],
+    alertRules: [],
     assets: [
       {
         asset_id: 'cash',
@@ -56,6 +80,18 @@ export const mockScenarios: ScenarioFormValues[] = [
     inflationRate: 0.015,
     monthlyExpense: 280000,
     monthlyInvestment: 150000,
+    assumptions: {
+      birth_date: '1980-01-01',
+      simulation_start_month: '2026-06-01',
+      simulation_end_age: 95,
+      inflation_rate: 0.015,
+      tax_rates: {
+        capital_gains: 0.2,
+      },
+    },
+    transferEvents: [],
+    stateTransitions: [],
+    alertRules: [],
     assets: [
       {
         asset_id: 'cash',

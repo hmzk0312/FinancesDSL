@@ -1,14 +1,11 @@
-export type ScenarioFormValues = {
-  id: string;
-  name: string;
-  retirementAge: number;
-  inflationRate: number;
-  monthlyExpense: number;
-  monthlyInvestment: number;
-  assets: Asset[];
-  transferEvents?: TransferEvent[];
-  stateTransitions?: StateTransition[];
-  alertRules?: AlertRule[];
+export type ScenarioAssumptions = {
+  birth_date: string;
+  simulation_start_month: string;
+  simulation_end_age: number;
+  inflation_rate: number;
+  tax_rates: {
+    capital_gains: number;
+  };
 };
 
 export type RateProfile = {
@@ -37,68 +34,45 @@ export type TransferEvent = {
     type: 'once' | 'monthly' | 'yearly';
     month?: string;
   };
-  condition?: {
-    state?: Record<string, string>;
-    age?: { eq?: number; gte?: number; lte?: number };
-    value?: {
-      target: {
-        type: 'metric' | 'asset';
-        id: string;
-      };
-      operator: 'eq' | 'gte' | 'lte';
-      value: number;
+  condition?: Condition;
+};
+
+export type Condition = {
+  state?: Record<string, string>;
+  age?: { eq?: number; gte?: number; lte?: number };
+  value?: {
+    target: {
+      type: 'metric' | 'asset';
+      id: string;
     };
+    operator: 'eq' | 'gte' | 'lte';
+    value: number;
   };
 };
 
 export type StateTransition = {
   id: string;
   state: string;
-  condition: {
-    state?: Record<string, string>;
-    age?: { eq?: number; gte?: number; lte?: number };
-    value?: {
-      target: {
-        type: 'metric' | 'asset';
-        id: string;
-      };
-      operator: 'eq' | 'gte' | 'lte';
-      value: number;
-    };
-  };
-};
-
-export type AlertTarget = {
-  type: 'metric' | 'asset';
-  id: string;
+  condition: Condition;
 };
 
 export type AlertRule = {
   id: string;
-  target: AlertTarget;
-  condition: {
-    value: {
-      target: AlertTarget;
-      operator: 'eq' | 'gte' | 'lte';
-      value: number;
-    };
-  };
+  condition: Condition;
   purpose: 'warning' | 'failure_condition' | 'success_condition';
   message: string;
 };
 
 export type Scenario = {
-  assumptions: {
-    birth_date: string;
-    simulation_start_month: string;
-    simulation_end_age: number;
-    inflation_rate: number;
-    tax_rates: {
-      capital_gains: number;
-    };
-  };
+  id: string;
+  name: string;
+  retirementAge: number;
+  inflationRate: number;
+  monthlyExpense: number;
+  monthlyInvestment: number;
   assets: Asset[];
-  transfer_events: TransferEvent[];
-  state_transitions: StateTransition[];
-  alert_rules: AlertRule[];
+  transferEvents: TransferEvent[];
+  stateTransitions: StateTransition[];
+  alertRules: AlertRule[];
+  assumptions: ScenarioAssumptions;
 };
