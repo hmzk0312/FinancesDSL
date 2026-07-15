@@ -3,10 +3,6 @@ import { Scenario } from './scenario';
 export const DEFAULT_SCENARIO: Scenario = {
   id: 'default',
   name: 'Default Scenario',
-  retirementAge: 65,
-  inflationRate: 0.02,
-  monthlyExpense: 0,
-  monthlyInvestment: 0,
   assets: [
     {
       asset_id: 'cash',
@@ -36,7 +32,10 @@ export const DEFAULT_SCENARIO: Scenario = {
     birth_date: '1980-01-01',
     simulation_start_month: '2026-06-01',
     simulation_end_age: 95,
+    retirement_age: 65,
     inflation_rate: 0.02,
+    monthly_expense: 0,
+    monthly_investment: 0,
     tax_rates: {
       capital_gains: 0.2,
     },
@@ -48,7 +47,6 @@ export const toScenario = (values: Scenario): Scenario => ({
   assumptions: {
     ...DEFAULT_SCENARIO.assumptions,
     ...values.assumptions,
-    inflation_rate: values.inflationRate,
     simulation_start_month: DEFAULT_SCENARIO.assumptions.simulation_start_month,
   },
   assets: values.assets.map((asset) => ({

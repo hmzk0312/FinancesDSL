@@ -385,8 +385,8 @@ export const runSimulation = (
       });
     }
 
-    const cash = nextAssets.cash.market_value - scenarioForm.monthlyExpense;
-    const investment = nextAssets.investment.market_value + scenarioForm.monthlyInvestment;
+    const cash = nextAssets.cash.market_value - scenario.assumptions.monthly_expense;
+    const investment = nextAssets.investment.market_value + scenario.assumptions.monthly_investment;
 
     const monthlyReturn = monthlyRate(investmentReturnRate);
     const investmentAfterReturn = investment + investment * monthlyReturn;

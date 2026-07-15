@@ -4,15 +4,14 @@ export const mockScenarios: Scenario[] = [
   {
     id: 'scenario-1',
     name: 'Base Case',
-    retirementAge: 60,
-    inflationRate: 0.02,
-    monthlyExpense: 300000,
-    monthlyInvestment: 100000,
     assumptions: {
       birth_date: '1980-01-01',
       simulation_start_month: '2026-06-01',
       simulation_end_age: 95,
+      retirement_age: 60,
       inflation_rate: 0.02,
+      monthly_expense: 300000,
+      monthly_investment: 100000,
       tax_rates: {
         capital_gains: 0.2,
       },
@@ -40,15 +39,14 @@ export const mockScenarios: Scenario[] = [
   {
     id: 'scenario-2',
     name: 'Conservative',
-    retirementAge: 65,
-    inflationRate: 0.03,
-    monthlyExpense: 320000,
-    monthlyInvestment: 80000,
     assumptions: {
       birth_date: '1980-01-01',
       simulation_start_month: '2026-06-01',
       simulation_end_age: 95,
+      retirement_age: 65,
       inflation_rate: 0.03,
+      monthly_expense: 320000,
+      monthly_investment: 80000,
       tax_rates: {
         capital_gains: 0.2,
       },
@@ -76,15 +74,14 @@ export const mockScenarios: Scenario[] = [
   {
     id: 'scenario-3',
     name: 'Aggressive',
-    retirementAge: 55,
-    inflationRate: 0.015,
-    monthlyExpense: 280000,
-    monthlyInvestment: 150000,
     assumptions: {
       birth_date: '1980-01-01',
       simulation_start_month: '2026-06-01',
       simulation_end_age: 95,
+      retirement_age: 55,
       inflation_rate: 0.015,
+      monthly_expense: 280000,
+      monthly_investment: 150000,
       tax_rates: {
         capital_gains: 0.2,
       },

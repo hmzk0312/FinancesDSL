@@ -1,16 +1,24 @@
-export type ScenarioAssumptions = {
+export type Scenario = {
+  id: string;
+  name: string;
+  assets: Asset[];
+  transferEvents: TransferEvent[];
+  stateTransitions: StateTransition[];
+  alertRules: AlertRule[];
+  assumptions: Assumptions;
+};
+
+export type Assumptions = {
   birth_date: string;
   simulation_start_month: string;
   simulation_end_age: number;
+  retirement_age: number;
   inflation_rate: number;
+  monthly_expense: number;
+  monthly_investment: number;
   tax_rates: {
     capital_gains: number;
   };
-};
-
-export type RateProfile = {
-  type: 'fixed';
-  annual_rate: number;
 };
 
 export type Asset = {
@@ -20,6 +28,11 @@ export type Asset = {
   liquidity_profile: 'cash' | 'liquid' | 'restricted';
   tax_profile: 'none' | 'tax_free' | 'capital_gains' | 'retirement_income';
   return_profile: RateProfile;
+};
+
+export type RateProfile = {
+  type: 'fixed';
+  annual_rate: number;
 };
 
 export type TransferEvent = {
@@ -37,19 +50,6 @@ export type TransferEvent = {
   condition?: Condition;
 };
 
-export type Condition = {
-  state?: Record<string, string>;
-  age?: { eq?: number; gte?: number; lte?: number };
-  value?: {
-    target: {
-      type: 'metric' | 'asset';
-      id: string;
-    };
-    operator: 'eq' | 'gte' | 'lte';
-    value: number;
-  };
-};
-
 export type StateTransition = {
   id: string;
   state: string;
@@ -63,16 +63,15 @@ export type AlertRule = {
   message: string;
 };
 
-export type Scenario = {
-  id: string;
-  name: string;
-  retirementAge: number;
-  inflationRate: number;
-  monthlyExpense: number;
-  monthlyInvestment: number;
-  assets: Asset[];
-  transferEvents: TransferEvent[];
-  stateTransitions: StateTransition[];
-  alertRules: AlertRule[];
-  assumptions: ScenarioAssumptions;
+export type Condition = {
+  state?: Record<string, string>;
+  age?: { eq?: number; gte?: number; lte?: number };
+  value?: {
+    target: {
+      type: 'metric' | 'asset';
+      id: string;
+    };
+    operator: 'eq' | 'gte' | 'lte';
+    value: number;
+  };
 };

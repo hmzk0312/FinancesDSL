@@ -31,6 +31,7 @@ assumptions:
   birth_date: YYYY-MM-DD
   simulation_start_month: YYYY-MM-01
   simulation_end_age: 95
+  retirement_age: number
   inflation_rate: number
   tax_rates:
     capital_gains: number
@@ -43,6 +44,7 @@ assumptions:
 | birth_date | string | ✓ | 生年月日 |
 | simulation_start_month | string | ✓ | シミュレーション開始年月 |
 | simulation_end_age | integer | ✓ | シミュレーション終了年齢 |
+| retirement_age | integer | | 退職年齢 |
 | inflation_rate | number | ✓ | 年間インフレ率 |
 | tax_rates.capital_gains | number | ✓ | 譲渡益課税率 |
 

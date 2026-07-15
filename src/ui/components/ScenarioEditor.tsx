@@ -1,5 +1,12 @@
 import React from 'react';
-import { Scenario, Asset, TransferEvent, StateTransition, AlertRule } from '../../domain/scenario';
+import {
+  Scenario,
+  Assumptions,
+  Asset,
+  TransferEvent,
+  StateTransition,
+  AlertRule,
+} from '../../domain/scenario';
 
 type Props = {
   scenarios: Scenario[];
@@ -69,6 +76,16 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
     onChange({ ...value, alertRules: nextAlertRules });
   };
 
+  const updateAssumptions = <K extends keyof Assumptions>(key: K, nextValue: Assumptions[K]) => {
+    onChange({
+      ...value,
+      assumptions: {
+        ...value.assumptions,
+        [key]: nextValue,
+      },
+    });
+  };
+
   const addAsset = () => updateAssets([...value.assets, { ...defaultAsset }]);
   const addTransferEvent = () =>
     updateTransferEvents([...(value.transferEvents ?? []), { ...defaultTransferEvent }]);
@@ -102,9 +119,9 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
         <label style={styles.label}>リタイア年齢</label>
         <input
           type="number"
-          value={value.retirementAge}
+          value={value.assumptions.retirement_age}
           min={40}
-          onChange={(event) => updateField('retirementAge', Number(event.target.value))}
+          onChange={(event) => updateAssumptions('retirement_age', Number(event.target.value))}
           style={styles.input}
         />
       </div>
@@ -114,8 +131,8 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
         <input
           type="number"
           step="0.001"
-          value={value.inflationRate}
-          onChange={(event) => updateField('inflationRate', Number(event.target.value))}
+          value={value.assumptions.inflation_rate}
+          onChange={(event) => updateAssumptions('inflation_rate', Number(event.target.value))}
           style={styles.input}
         />
       </div>
@@ -124,8 +141,8 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
         <label style={styles.label}>月次支出</label>
         <input
           type="number"
-          value={value.monthlyExpense}
-          onChange={(event) => updateField('monthlyExpense', Number(event.target.value))}
+          value={value.assumptions.monthly_expense}
+          onChange={(event) => updateAssumptions('monthly_expense', Number(event.target.value))}
           style={styles.input}
         />
       </div>
@@ -134,8 +151,8 @@ export const ScenarioEditor = ({ scenarios, value, onChange }: Props) => {
         <label style={styles.label}>月次投資額</label>
         <input
           type="number"
-          value={value.monthlyInvestment}
-          onChange={(event) => updateField('monthlyInvestment', Number(event.target.value))}
+          value={value.assumptions.monthly_investment}
+          onChange={(event) => updateAssumptions('monthly_investment', Number(event.target.value))}
           style={styles.input}
         />
       </div>

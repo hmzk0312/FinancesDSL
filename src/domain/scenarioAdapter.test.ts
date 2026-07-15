@@ -7,15 +7,14 @@ describe('Scenario Adapter', () => {
     const formValues: Scenario = {
       id: 'adapter-test',
       name: 'Adapter Test',
-      retirementAge: 65,
-      inflationRate: 0.03,
-      monthlyExpense: 150000,
-      monthlyInvestment: 250000,
       assumptions: {
         birth_date: '1980-01-01',
         simulation_start_month: '2026-06-01',
         simulation_end_age: 95,
+        retirement_age: 65,
         inflation_rate: 0.03,
+        monthly_expense: 150000,
+        monthly_investment: 250000,
         tax_rates: {
           capital_gains: 0.2,
         },

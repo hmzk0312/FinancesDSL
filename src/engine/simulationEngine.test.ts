@@ -7,15 +7,14 @@ import { ActualObservation } from '../domain/observation';
 const baseScenario: Scenario = {
   id: 'test-scenario',
   name: 'Test Scenario',
-  retirementAge: 60,
-  inflationRate: 0.02,
-  monthlyExpense: 100000,
-  monthlyInvestment: 200000,
   assumptions: {
     birth_date: '1980-01-01',
     simulation_start_month: '2026-06-01',
     simulation_end_age: 95,
+    retirement_age: 60,
     inflation_rate: 0.02,
+    monthly_expense: 100000,
+    monthly_investment: 200000,
     tax_rates: {
       capital_gains: 0.2,
     },
@@ -63,8 +62,11 @@ describe('Simulation Engine', () => {
     const result = runSimulation(
       {
         ...baseScenario,
-        monthlyExpense: 0,
-        monthlyInvestment: 0,
+        assumptions: {
+          ...baseScenario.assumptions,
+          monthly_expense: 0,
+          monthly_investment: 0,
+        },
         assets: baseScenario.assets.map((asset) =>
           asset.asset_id === 'investment'
             ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0.12 } }
@@ -83,7 +85,10 @@ describe('Simulation Engine', () => {
     const scenario60 = runSimulation(
       {
         ...baseScenario,
-        retirementAge: 60,
+        assumptions: {
+          ...baseScenario.assumptions,
+          retirement_age: 60,
+        },
       },
       [],
       1
@@ -91,7 +96,10 @@ describe('Simulation Engine', () => {
     const scenario65 = runSimulation(
       {
         ...baseScenario,
-        retirementAge: 65,
+        assumptions: {
+          ...baseScenario.assumptions,
+          retirement_age: 65,
+        },
       },
       [],
       1
@@ -114,8 +122,11 @@ describe('Simulation Engine', () => {
   it('applies transfer_events to asset balances before monthly return', () => {
     const scenarioWithTransfer: Scenario = {
       ...baseScenario,
-      monthlyExpense: 0,
-      monthlyInvestment: 0,
+      assumptions: {
+        ...baseScenario.assumptions,
+        monthly_expense: 0,
+        monthly_investment: 0,
+      },
       assets: baseScenario.assets.map((asset) =>
         asset.asset_id === 'investment'
           ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0 } }
@@ -145,8 +156,11 @@ describe('Simulation Engine', () => {
   it('applies state_transitions when value condition matches', () => {
     const scenarioWithTransition: Scenario = {
       ...baseScenario,
-      monthlyExpense: 0,
-      monthlyInvestment: 0,
+      assumptions: {
+        ...baseScenario.assumptions,
+        monthly_expense: 0,
+        monthly_investment: 0,
+      },
       assets: baseScenario.assets.map((asset) =>
         asset.asset_id === 'investment'
           ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0 } }
@@ -188,8 +202,11 @@ describe('Simulation Engine', () => {
     const result = runSimulation(
       {
         ...baseScenario,
-        monthlyExpense: 0,
-        monthlyInvestment: 0,
+        assumptions: {
+          ...baseScenario.assumptions,
+          monthly_expense: 0,
+          monthly_investment: 0,
+        },
         assets: baseScenario.assets.map((asset) =>
           asset.asset_id === 'investment'
             ? { ...asset, return_profile: { type: 'fixed', annual_rate: 0 } }
